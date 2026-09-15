@@ -1,10 +1,21 @@
 ---
+# https://github.com/benmcollins/libjwt/tags
+
 libjwt_repo: "https://github.com/benmcollins/libjwt.git"
-libjwt_version: "v1.12.0"
-libjwt_source_dir: "/home/ec2-user/slurm-files/libjwt"
-libjwt_build_deps:
+libjwt_version: "v3.6.1"
+# libjwt_version: "v1.12.0"
+libjwt_source_dir: "/home/{{ ansible_user }}/slurm-files/libjwt"
+
+libjwt_build_deps_rpm:
   - automake
   - libtool
   - pkgconfig
   - jansson-devel
   - openssl-devel
+
+libjwt_build_deps_apt:
+  - automake
+  - libtool
+  - pkgconf
+  - libjansson-dev
+  - libssl-dev

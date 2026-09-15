@@ -3,7 +3,13 @@
 slurm_db_password: ""
 
 # MariaDB packages
-mariadb_packages:
+mariadb_packages_rpm:
   - mariadb105-server
   - mariadb105-devel
   - mariadb105
+
+# MariaDB packages
+mariadb_packages_apt:
+  - mariadb-server
+  - libmariadb-dev
+  - mariadb-client

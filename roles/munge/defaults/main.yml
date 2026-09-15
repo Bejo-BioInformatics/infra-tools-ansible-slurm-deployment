@@ -1,5 +1,11 @@
 ---
-munge_packages:
+munge_packages_rpm:
   - munge
   - munge-devel
   - munge-libs
+
+# https://github.com/vishalpapan/ansible-slurm-deployment/blob/main/roles/munge/defaults/main.yml
+munge_packages_apt:
+  - munge
+  - libmunge2
+  - libmunge-dev

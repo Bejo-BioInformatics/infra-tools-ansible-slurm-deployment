@@ -1,10 +1,21 @@
 ---
+- name: Create Slurm source code directory
+  file:
+    path: "{{ slurm_source_dir }}/"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
+
 - name: Download Slurm source code
   get_url:
     url: "{{ slurm_download_url }}"
     dest: "{{ slurm_source_dir }}/{{ slurm_tarball_name }}"
     mode: '0644'
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Clean up any previous extraction (if files are in wrong location)
   file:
@@ -25,10 +36,11 @@
   file:
     path: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}"
     state: directory
-    owner: ec2-user
-    group: ec2-user
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0755'
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Extract Slurm tarball to version directory
   unarchive:
@@ -37,6 +49,7 @@
     remote_src: yes
     extra_opts: "--strip-components=1"
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Configure Slurm build
   command:
@@ -44,6 +57,7 @@
     chdir: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}"
     creates: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}/config.status"
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Build Slurm
   command:
@@ -51,6 +65,7 @@
     chdir: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}"
     creates: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}/src/slurmd/slurmd"
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install Slurm
   command:
@@ -58,6 +73,7 @@
     chdir: "{{ slurm_source_dir }}/slurm-{{ slurm_version }}"
   become: yes
   tags: slurm_install
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Copy systemd service files
   copy:
@@ -73,9 +89,11 @@
     - slurmdbd
   become: yes
   tags: slurm_services
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Reload systemd
   systemd:
     daemon_reload: yes
   become: yes
   tags: slurm_services
+  ignore_errors: "{{ ansible_check_mode }}"

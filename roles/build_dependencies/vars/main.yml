@@ -1,5 +1,5 @@
 ---
-base_packages:
+base_packages_rpm:
   - gcc
   - gcc-c++
   - make
@@ -27,7 +27,34 @@ base_packages:
   - systemd-devel
   - mariadb105-devel
 
-dev_libraries:
+# https://github.com/vishalpapan/ansible-slurm-deployment/blob/main/roles/build_dependencies/vars/main.yml
+base_packages_apt:
+  - gcc
+  - g++
+  - make
+  - libssl-dev
+  - libpam0g-dev
+  - libextutils-makemaker-cpanfile-perl
+  - python3-dev
+  - tar
+  - lua5.4
+  - liblua5.4-dev
+  - libreadline8t64
+  - libreadline6-dev
+  - cmake
+  - git
+  - libjansson4
+  - libjansson-dev
+  - autoconf
+  - pkgconf
+  - libtool
+  - wget
+  - bzip2
+  - libdbus-1-dev
+  - libsystemd-dev
+  - libmariadb-dev
+
+dev_libraries_rpm:
   - lua-devel
   - pam-devel
   - perl-ExtUtils-MakeMaker
@@ -36,3 +63,13 @@ dev_libraries:
   - python3-devel
   - dbus-devel
   - systemd-devel
+
+dev_libraries_apt:
+  - liblua5.4-dev
+  - libpam0g-dev
+  - libextutils-makemaker-cpanfile-perl
+  - libreadline6-dev
+  - libssl-dev
+  - python3-dev
+  - libdbus-1-dev
+  - libsystemd-dev

@@ -3,13 +3,13 @@
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ base_packages }}"
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
   tags: base_deps
 
 - name: Install Development libraries
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ dev_libraries }}"
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(dev_libraries_apt, dev_libraries_rpm) }}"
   tags: dev_libs
 

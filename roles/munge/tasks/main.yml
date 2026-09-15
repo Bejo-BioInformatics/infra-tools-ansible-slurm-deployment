@@ -3,7 +3,7 @@
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ munge_packages }}"
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(munge_packages_apt, munge_packages_rpm) }}"
   tags: munge_install
 
 - name: Create munge user
@@ -44,3 +44,4 @@
     enabled: yes
     state: started
   tags: munge_service
+  ignore_errors: "{{ ansible_check_mode }}"

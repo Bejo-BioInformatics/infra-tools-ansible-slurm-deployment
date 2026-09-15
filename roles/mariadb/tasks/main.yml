@@ -3,7 +3,7 @@
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ mariadb_packages }}"
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(mariadb_packages_apt, mariadb_packages_rpm) }}"
   tags: mariadb_install
 
 - name: Start and enable MariaDB service
@@ -12,6 +12,7 @@
     enabled: yes
     state: started
   tags: mariadb_service
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Wait for MariaDB to be ready
   wait_for:

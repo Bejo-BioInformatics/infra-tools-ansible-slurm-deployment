@@ -20,7 +20,7 @@
   package:
     name: "{{ item }}"
     state: present
-  loop: "{{ libjwt_build_deps }}"
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(libjwt_build_deps_apt, libjwt_build_deps_rpm) }}"
   tags: libjwt
 
 - name: Run autoconf for libjwt
@@ -29,6 +29,7 @@
     chdir: "{{ libjwt_source_dir }}"
     creates: "{{ libjwt_source_dir }}/configure"
   tags: libjwt
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Configure libjwt
   command:
@@ -36,6 +37,7 @@
     chdir: "{{ libjwt_source_dir }}"
     creates: "{{ libjwt_source_dir }}/config.status"
   tags: libjwt
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Build libjwt
   command:
@@ -43,12 +45,14 @@
     chdir: "{{ libjwt_source_dir }}"
     creates: "{{ libjwt_source_dir }}/.libs/libjwt.so"
   tags: libjwt
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install libjwt
   command:
     cmd: "make install"
     chdir: "{{ libjwt_source_dir }}"
   become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
   tags: libjwt
 
 - name: Update library cache for libjwt
