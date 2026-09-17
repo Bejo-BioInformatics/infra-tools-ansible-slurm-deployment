@@ -1,0 +1,32 @@
+---
+# https://www.linkedin.com/pulse/slurm-setup-easy-way-ubuntu-2404-practical-guide-building-nagaraj-s-tj7cc
+
+- name: Install Slurm Controller packages
+  package:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_apt, slurm_packages_rpm) }}"
+  tags: slurm_controller_install
+
+- name: Enable and start Slurm Controller services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - slurmctld
+    # - slurmd
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  tags: [slurm_controller_install, slurm_controller_services]
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  tags: [slurm_controller_install, slurm_controller_services]
+  ignore_errors: "{{ ansible_check_mode }}"

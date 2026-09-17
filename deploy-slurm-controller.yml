@@ -10,10 +10,10 @@
     - role: munge
     - role: build_dependencies
     - role: mariadb
-    - role: json_c
-    - role: libjwt
-    - role: slurm_install
+    # - role: json_c
+    # - role: libjwt
     - role: slurm_config
+    - role: slurm_install_controller
 
   tasks:
     - name: Disable slurmd on controller (optional)

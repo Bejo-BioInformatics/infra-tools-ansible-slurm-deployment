@@ -1,0 +1,32 @@
+---
+# https://www.linkedin.com/pulse/slurm-setup-easy-way-ubuntu-2404-practical-guide-building-nagaraj-s-tj7cc
+
+- name: Install Slurm Worker packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_apt, slurm_packages_rpm) }}"
+  become: yes
+  when: inventory_hostname in groups['slurm_workers']
+  tags: slurm_worker_install
+
+- name: Enable and start Slurm Worker services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - slurmdbd
+    - slurmd
+  become: yes
+  when: inventory_hostname in groups['slurm_workers']
+  tags: [slurm_worker_install, slurm_worker_services]
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+  become: yes
+  when: inventory_hostname in groups['slurm_workers']
+  tags: [slurm_worker_install, slurm_worker_services]
+  ignore_errors: "{{ ansible_check_mode }}"

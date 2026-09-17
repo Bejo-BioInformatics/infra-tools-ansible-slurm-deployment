@@ -23,37 +23,74 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(libjwt_build_deps_apt, libjwt_build_deps_rpm) }}"
   tags: libjwt
 
-- name: Run autoconf for libjwt
+# -- Up-to-date: /usr/local/lib/libjwt.a
+# -- Up-to-date: /usr/local/include/jwt.h
+
+- name: Create libjwt build directory
+  file:
+    path: "{{ libjwt_source_dir }}/build"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  tags: libjwt
+
+- name: Run cmake for libjwt
   command:
-    cmd: "autoreconf --install"
-    chdir: "{{ libjwt_source_dir }}"
-    creates: "{{ libjwt_source_dir }}/configure"
+    cmd: "cmake .."
+    chdir: "{{ libjwt_source_dir }}/build"
+    creates: "{{ libjwt_source_dir }}/build/Makefile"
   tags: libjwt
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Configure libjwt
-  command:
-    cmd: "./configure --prefix=/usr/local"
-    chdir: "{{ libjwt_source_dir }}"
-    creates: "{{ libjwt_source_dir }}/config.status"
-  tags: libjwt
-  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Build libjwt
   command:
     cmd: "make -j"
-    chdir: "{{ libjwt_source_dir }}"
-    creates: "{{ libjwt_source_dir }}/.libs/libjwt.so"
+    chdir: "{{ libjwt_source_dir }}/build"
+    creates: "{{ libjwt_source_dir }}/build/libjwt.so"
   tags: libjwt
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Install libjwt
   command:
     cmd: "make install"
-    chdir: "{{ libjwt_source_dir }}"
+    chdir: "{{ libjwt_source_dir }}/build"
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
   tags: libjwt
+
+# - name: Run autoconf for libjwt
+#   command:
+#     cmd: "autoreconf --install"
+#     chdir: "{{ libjwt_source_dir }}"
+#     creates: "{{ libjwt_source_dir }}/configure"
+#   tags: libjwt
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: Configure libjwt
+#   command:
+#     cmd: "./configure --prefix=/usr/local"
+#     chdir: "{{ libjwt_source_dir }}"
+#     creates: "{{ libjwt_source_dir }}/config.status"
+#   tags: libjwt
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: Build libjwt
+#   command:
+#     cmd: "make -j"
+#     chdir: "{{ libjwt_source_dir }}"
+#     creates: "{{ libjwt_source_dir }}/.libs/libjwt.so"
+#   tags: libjwt
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: Install libjwt
+#   command:
+#     cmd: "make install"
+#     chdir: "{{ libjwt_source_dir }}"
+#   become: yes
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: libjwt
 
 - name: Update library cache for libjwt
   command:

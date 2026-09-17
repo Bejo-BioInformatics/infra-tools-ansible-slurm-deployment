@@ -26,6 +26,7 @@ base_packages_rpm:
   - dbus-devel
   - systemd-devel
   - mariadb105-devel
+  - numactl-devel
 
 # https://github.com/vishalpapan/ansible-slurm-deployment/blob/main/roles/build_dependencies/vars/main.yml
 base_packages_apt:
@@ -53,6 +54,7 @@ base_packages_apt:
   - libdbus-1-dev
   - libsystemd-dev
   - libmariadb-dev
+  - libnuma-dev
 
 dev_libraries_rpm:
   - lua-devel

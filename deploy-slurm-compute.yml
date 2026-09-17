@@ -9,10 +9,10 @@
     - role: slurm_user
     - role: munge
     - role: build_dependencies
-    - role: json_c
-    - role: libjwt
-    - role: slurm_install
+    # - role: json_c
+    # - role: libjwt
     - role: slurm_config
+    - role: slurm_install_worker
 
   tasks:
     - name: Disable controller services on compute nodes

@@ -22,7 +22,7 @@
     group: munge
     mode: "{{ item.mode }}"
   loop:
-    - { path: '/etc/munge', mode: '0700' }
+    - { path: '/etc/munge',     mode: '0700' }
     - { path: '/var/lib/munge', mode: '0700' }
     - { path: '/var/log/munge', mode: '0755' }
   tags: munge_directories

@@ -1,0 +1,6 @@
+---
+slurm_packages_rpm: []
+
+slurm_packages_apt:
+- slurmdbd
+- slurmd
