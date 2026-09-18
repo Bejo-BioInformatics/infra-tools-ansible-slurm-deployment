@@ -105,6 +105,51 @@
 
 
 
+
+
+# - name: Enable and start Slurm CTL services in Controllers
+#   systemd:
+#     name: "{{ item }}"
+#     enabled: yes
+#     state: started
+#   loop:
+#     - slurmctld
+#     # - slurmdbd
+#   become: yes
+#   when: (disable_slurmd_on_controller | default(true)) and (inventory_hostname in groups['slurm_controllers'])
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_config]
+
+
+
+# - name: Enable and start Slurm Daemon services in Workers
+#   systemd:
+#     name: "{{ item }}"
+#     enabled: yes
+#     state: started
+#   loop:
+#     # - slurmdbd
+#     - slurmd
+#   become: yes
+#   when: inventory_hostname in groups['slurm_computes']
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_config]
+
+
+
+# - name: Reload systemd
+#   systemd:
+#     daemon_reload: yes
+#   become: yes
+#   # when: inventory_hostname in groups['slurm_controllers']
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_config]
+
+
+
+
 - name: reload systemd
   systemd:
     daemon_reload: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [slurm, slurm_config]
