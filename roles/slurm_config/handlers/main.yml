@@ -5,7 +5,7 @@
     state: restarted
   loop:
     - slurmctld
-    - slurmdbd
+    # - slurmdbd
     - slurmd
 
 - name: restart slurmdbd

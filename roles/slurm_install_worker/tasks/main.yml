@@ -7,7 +7,7 @@
     state: present
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_apt, slurm_packages_rpm) }}"
   become: yes
-  when: inventory_hostname in groups['slurm_workers']
+  when: inventory_hostname in groups['slurm_computes']
   tags: slurm_worker_install
 
 - name: Enable and start Slurm Worker services
@@ -19,7 +19,7 @@
     - slurmdbd
     - slurmd
   become: yes
-  when: inventory_hostname in groups['slurm_workers']
+  when: inventory_hostname in groups['slurm_computes']
   tags: [slurm_worker_install, slurm_worker_services]
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -27,6 +27,6 @@
   systemd:
     daemon_reload: yes
   become: yes
-  when: inventory_hostname in groups['slurm_workers']
+  when: inventory_hostname in groups['slurm_computes']
   tags: [slurm_worker_install, slurm_worker_services]
   ignore_errors: "{{ ansible_check_mode }}"

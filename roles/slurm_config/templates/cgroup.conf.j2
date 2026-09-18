@@ -1,5 +1,11 @@
 # cgroup.conf for cgroup v2
-CgroupPlugin=cgroup/v2
-ConstrainCores=no
-ConstrainRAMSpace=no
-ConstrainDevices=no
+#CgroupPlugin=cgroup/v2
+#ConstrainCores=no
+#ConstrainRAMSpace=no
+#ConstrainDevices=no
+
+CgroupPlugin=autodetect
+ConstrainCores=yes
+ConstrainRAMSpace=yes
+ConstrainSwapSpace=no
+AllowedRAMSpace=100
