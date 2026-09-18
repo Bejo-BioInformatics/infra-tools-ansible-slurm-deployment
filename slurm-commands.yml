@@ -57,9 +57,15 @@
     - debug:
         var: completed_job_stats.stdout
 
+    - name: Run a test job on 2 nodes
+      command: srun -N 2 hostname
+      register: test_job_output
+    - debug:
+        var: test_job_output.stdout
+
     - name: copy the output to a local file
       copy:
-        content: "#{{ slurm_cluster_name }}\n\n## Cluster Info\n{{ cluster_info.stdout }}\n\n## Node Info\n{{ node_info.stdout }}\n\n## Cluster Nodes\n{{ cluster_nodes.stdout }}\n\n## Cluster Jobs\n{{ cluster_jobs.stdout }}\n\n## Completed Jobs\n{{ completed_jobs.stdout }}\n\n## Fair Share Priority\n{{ fair_share_priority.stdout }}\n\n## Job Priority\n{{ job_priority.stdout }}\n\n## Completed Job Stats\n{{ completed_job_stats.stdout }}"
+        content: "#{{ slurm_cluster_name }}\n\n## Cluster Info\n{{ cluster_info.stdout }}\n\n## Node Info\n{{ node_info.stdout }}\n\n## Cluster Nodes\n{{ cluster_nodes.stdout }}\n\n## Cluster Jobs\n{{ cluster_jobs.stdout }}\n\n## Completed Jobs\n{{ completed_jobs.stdout }}\n\n## Fair Share Priority\n{{ fair_share_priority.stdout }}\n\n## Job Priority\n{{ job_priority.stdout }}\n\n## Completed Job Stats\n{{ completed_job_stats.stdout }}\n\n## Test Job Output\n{{ test_job_output.stdout }}"
         dest: "./cluster_info-{{ slurm_cluster_name }}.txt"
       delegate_to: localhost
 
