@@ -54,13 +54,12 @@ SlurmdDebug=info
 SlurmdLogFile=/var/log/slurm/slurmd.log
 
 
-
 # DYNAMIC NODE LIST - All nodes get same list
 {% if ('slurm_computes_cpu' in groups) and ((groups['slurm_computes_cpu']|length) > 0) %}
 {#-#}
 {% for host in groups['slurm_computes_cpu'] %}
 {% if ('ansible_facts' in hostvars[host]) and ('hostname' in hostvars[host].ansible_facts) %}
-NodeName={{ host }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} sockets={{ hostvars[host].ansible_facts.processor_count }} CPUs={{ hostvars[host].ansible_facts.processor_cores }} ThreadsPerCore={{ hostvars[host].ansible_facts.processor_threads_per_core }} RealMemory={{ hostvars[host].ansible_facts.memtotal_mb }} State=UNKNOWN
+NodeName={{ hostvars[host].ansible_facts.hostname }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} SocketsPerBoard={{ hostvars[host].ansible_facts.processor_count }} CPUs={{ hostvars[host].ansible_facts.processor_nproc }} CoresPerSocket={{ hostvars[host].ansible_facts.processor_cores }} ThreadsPerCore={{ hostvars[host].ansible_facts.processor_threads_per_core }} RealMemory={{ hostvars[host].ansible_facts.memtotal_mb }} State=UNKNOWN
 {% endif %}
 {% endfor %}
 {% endif %}
@@ -68,7 +67,7 @@ NodeName={{ host }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} soc
 {% if ('slurm_computes_gpu' in groups) and ((groups['slurm_computes_gpu']|length) > 0) %}
 {% for host in groups['slurm_computes_gpu'] %}
 {% if ('ansible_facts' in hostvars[host]) and ('hostname' in hostvars[host].ansible_facts) %}
-NodeName={{ host }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} sockets={{ hostvars[host].ansible_facts.processor_count }} CPUs={{ hostvars[host].ansible_facts.processor_cores }} ThreadsPerCore={{ hostvars[host].ansible_facts.processor_threads_per_core }} RealMemory={{ hostvars[host].ansible_facts.memtotal_mb }} State=UNKNOWN
+NodeName={{ hostvars[host].ansible_facts.hostname }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} SocketsPerBoard={{ hostvars[host].ansible_facts.processor_count }} CPUs={{ hostvars[host].ansible_facts.processor_nproc }} CoresPerSocket={{ hostvars[host].ansible_facts.processor_cores }} ThreadsPerCore={{ hostvars[host].ansible_facts.processor_threads_per_core }} RealMemory={{ hostvars[host].ansible_facts.memtotal_mb }} State=UNKNOWN
 {% endif %}
 {% endfor %}
 {% endif %}
@@ -76,14 +75,14 @@ NodeName={{ host }} NodeHostname={{ hostvars[host].ansible_facts.hostname }} soc
 
 
 # DYNAMIC PARTITION
-PartitionName=debug Nodes={% for host in (('slurm_computes_cpu' in groups) | ternary(groups['slurm_computes_cpu'], [])) + (('slurm_computes_gpu' in groups) | ternary(groups['slurm_computes_gpu'], [])) %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
+PartitionName=debug Nodes={% for host in (('slurm_computes_cpu' in groups) | ternary(groups['slurm_computes_cpu'], [])) + (('slurm_computes_gpu' in groups) | ternary(groups['slurm_computes_gpu'], [])) %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
 {##}
 {% if ('slurm_computes_cpu' in groups) and ((groups['slurm_computes_cpu']|length) > 0) %}
-PartitionName=cpu   Nodes={% for host in groups['slurm_computes_cpu'] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
+PartitionName=cpu   Nodes={% for host in groups['slurm_computes_cpu'] %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
 {% endif %}
 {#-#}
 {% if ('slurm_computes_gpu' in groups) and ((groups['slurm_computes_gpu']|length) > 0) %}
-PartitionName=gpu   Nodes={% for host in groups['slurm_computes_gpu'] %}{{ host }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
+PartitionName=gpu   Nodes={% for host in groups['slurm_computes_gpu'] %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
 {% endif %}
 
 

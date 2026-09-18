@@ -51,10 +51,8 @@ base_packages_apt:
   - libtool
   - wget
   - bzip2
-  - libdbus-1-dev
-  - libsystemd-dev
-  - libmariadb-dev
-  - libnuma-dev
+  - libpmix2
+  - openmpi-bin
 
 dev_libraries_rpm:
   - lua-devel
@@ -75,3 +73,7 @@ dev_libraries_apt:
   - python3-dev
   - libdbus-1-dev
   - libsystemd-dev
+  - libmariadb-dev
+  - libnuma-dev
+  - libpmix-dev
+  - libopenmpi-dev

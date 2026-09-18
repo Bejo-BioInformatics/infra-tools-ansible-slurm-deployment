@@ -63,31 +63,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_config]
 
-# - name: Disable and stop Slurm Daemon services in Controllers
-#   systemd:
-#     name: "{{ item }}"
-#     enabled: no
-#     state: stopped
-#   loop:
-#     - slurmd
-#   become: yes
-#   when: inventory_hostname in groups['slurm_controllers']
-#   ignore_errors: "{{ ansible_check_mode }}"
-#   tags: [slurm, slurm_config]
 
-
-
-# - name: Disable and Stop Slurm CTL services in Workers
-#   systemd:
-#     name: "{{ item }}"
-#     enabled: no
-#     state: stopped
-#   loop:
-#     - slurmctld
-#   become: yes
-#   when: (disable_slurmd_on_controller | default(true)) and (inventory_hostname in groups['slurm_computes'])
-#   ignore_errors: "{{ ansible_check_mode }}"
-#   tags: [slurm, slurm_config]
 
 - name: Enable and start Slurm Daemon services in Workers
   systemd:

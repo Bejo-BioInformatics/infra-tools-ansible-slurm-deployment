@@ -41,6 +41,12 @@
 
 
 
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+
+
 - name: Enable and start Slurm Controller services in Controllers
   systemd:
     name: "{{ item }}"
@@ -68,23 +74,37 @@
   tags: [slurm, slurm_install]
 
 
-# - name: Enable and start Slurm Worker services
-#   systemd:
-#     name: "{{ item }}"
-#     enabled: yes
-#     state: started
-#   loop:
-#     # - slurmctld
-#     - slurmd
-#   become: yes
-#   when: inventory_hostname in groups['slurm_computes']
-#   ignore_errors: "{{ ansible_check_mode }}"
-#   tags: [slurm, slurm_install]
 
-# - name: Reload systemd
-#   systemd:
-#     daemon_reload: yes
-#   become: yes
-#   # when: inventory_hostname in groups['slurm_controllers']
-#   ignore_errors: "{{ ansible_check_mode }}"
-#   tags: [slurm, slurm_install]
+- name: Restart Slurm Controller services in Controllers
+  systemd_service:
+    state: restarted
+    enabled: true
+    daemon_reexec: true
+    name: "{{ item }}"
+  loop:
+    - slurmctld
+    - slurmdbd
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [slurm, slurm_install]
+
+- name: Restart Slurm Worker services in Workers
+  systemd_service:
+    state: restarted
+    enabled: true
+    daemon_reexec: true
+    name: "{{ item }}"
+  loop:
+    - slurmd
+    # - slurmdbd
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [slurm, slurm_install]
+
+
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

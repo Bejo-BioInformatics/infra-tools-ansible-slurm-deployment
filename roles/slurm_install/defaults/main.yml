@@ -7,9 +7,9 @@ slurm_packages_worker_rpm: []
 
 slurm_packages_shared_apt:
 - slurm-client
-- slurmdbd
 
 slurm_packages_controller_apt:
+- slurmdbd
 - slurmctld
 - slurm-wlm-mysql-plugin
 
