@@ -1,0 +1,78 @@
+---
+# https://oneuptime.com/blog/post/2026-03-02-how-to-configure-slurm-workload-manager-on-ubuntu/view
+- name: Run Slurm Commands
+  hosts: slurm_controllers
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Show Cluster Info
+      command: sinfo
+      register: cluster_info
+    - debug:
+        var: cluster_info.stdout
+
+    - name: Show Node Information
+      command: sinfo -N -r -l
+      register: node_info
+    - debug:
+        var: node_info.stdout
+
+    - name: Show Cluster Nodes
+      command: scontrol show nodes
+      register: cluster_nodes
+    - debug:
+        var: cluster_nodes.stdout
+
+    - name: Show Cluster Jobs
+      command: squeue -a
+      register: cluster_jobs
+    - debug:
+        var: cluster_jobs.stdout
+
+    # - name: Show Cluster Queues
+    #   command: scontrol show queues
+
+    - name: Show completed jobs
+      command: sacct --format=JobID,JobName,Partition,State,ExitCode,Elapsed,MaxRSS
+      register: completed_jobs
+    - debug:
+        var: completed_jobs.stdout
+
+    - name: Show Fair Share Priority
+      command: sshare -l
+      register: fair_share_priority
+    - debug:
+        var: fair_share_priority.stdout
+
+    - name: Show Job Priority
+      command: sprio -l
+      register: job_priority
+    - debug:
+        var: job_priority.stdout
+
+    - name: Show Job Completion Statistics
+      command: sacct --format=JobID,JobName,Partition,State,ExitCode,Elapsed,MaxRSS --state=COMPLETED
+      register: completed_job_stats
+    - debug:
+        var: completed_job_stats.stdout
+
+    - name: copy the output to a local file
+      copy:
+        content: "#{{ slurm_cluster_name }}\n\n## Cluster Info\n{{ cluster_info.stdout }}\n\n## Node Info\n{{ node_info.stdout }}\n\n## Cluster Nodes\n{{ cluster_nodes.stdout }}\n\n## Cluster Jobs\n{{ cluster_jobs.stdout }}\n\n## Completed Jobs\n{{ completed_jobs.stdout }}\n\n## Fair Share Priority\n{{ fair_share_priority.stdout }}\n\n## Job Priority\n{{ job_priority.stdout }}\n\n## Completed Job Stats\n{{ completed_job_stats.stdout }}"
+        dest: "./cluster_info-{{ slurm_cluster_name }}.txt"
+      delegate_to: localhost
+
+# # Set resource limits per partition via QOS (Quality of Service)
+# # Add to slurm.conf or manage via sacctmgr
+
+# sacctmgr add qos high-priority priority=100 MaxTRESPerUser=cpu=32
+# sacctmgr add qos standard priority=50 MaxTRESPerUser=cpu=64 MaxWall=7-00:00:00
+# sacctmgr add qos low priority=10 MaxTRESPerUser=cpu=128
+
+# # Assign a QOS to a user
+# sacctmgr modify user alice set qos=standard
+
+# # Limit a partition to specific users
+# # In slurm.conf:
+# # PartitionName=restricted Nodes=compute-[01-03] AllowAccounts=myproject State=UP

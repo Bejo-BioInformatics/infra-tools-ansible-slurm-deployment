@@ -1,0 +1,90 @@
+---
+# https://www.linkedin.com/pulse/slurm-setup-easy-way-ubuntu-2404-practical-guide-building-nagaraj-s-tj7cc
+
+- name: Install Slurm Controller packages in Controller
+  package:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
+  tags: [slurm, slurm_install]
+
+- name: UnInstall Slurm Deamon packages in Controller
+  package:
+    name: "{{ item }}"
+    state: absent
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt, slurm_packages_worker_rpm) }}"
+  tags: [slurm, slurm_install]
+
+
+
+- name: Install Slurm Worker packages in Worker
+  package:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt + slurm_packages_shared_apt, slurm_packages_worker_rpm + slurm_packages_shared_rpm) }}"
+  tags: [slurm, slurm_install]
+
+- name: UnInstall Slurm Controller packages in Worker
+  package:
+    name: "{{ item }}"
+    state: absent
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt, slurm_packages_controller_rpm) }}"
+  tags: [slurm, slurm_install]
+
+
+
+- name: Enable and start Slurm Controller services in Controllers
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - slurmctld
+    # - slurmdbd
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [slurm, slurm_install]
+
+- name: Enable and start Slurm Worker services in Workers
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - slurmd
+    # - slurmdbd
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [slurm, slurm_install]
+
+
+# - name: Enable and start Slurm Worker services
+#   systemd:
+#     name: "{{ item }}"
+#     enabled: yes
+#     state: started
+#   loop:
+#     # - slurmctld
+#     - slurmd
+#   become: yes
+#   when: inventory_hostname in groups['slurm_computes']
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_install]
+
+# - name: Reload systemd
+#   systemd:
+#     daemon_reload: yes
+#   become: yes
+#   # when: inventory_hostname in groups['slurm_controllers']
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_install]
