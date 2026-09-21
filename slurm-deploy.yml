@@ -12,3 +12,4 @@
     - role: mariadb
     - role: slurm_config
     - role: slurm_install
+    - role: storage

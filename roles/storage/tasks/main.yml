@@ -1,0 +1,118 @@
+---
+- name: Install NFS packages
+  package:
+    name: "{{ item }}"
+    state: present
+  become: true
+  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(nfs_packages_apt, nfs_packages_rpm) }}"
+  tags: [storage, storage_install]
+
+
+
+- name: UnMount NFS 3 volumes
+  mount:
+    src: "{{ item.value.host }}:{{ item.value.src_path }}"
+    path: "{{ item.value.dst_path }}"
+    opts: "{{ item.value.mode }},{{ item.value.options }}"
+    boot: true
+    state: unmounted
+    fstype: nfs
+  loop: "{{ nfs_hosts.v3 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage,  storage_nfs, storage_nfs_v3]
+
+- name: UnMount NFS 4 volumes
+  mount:
+    src: "{{ item.value.host }}:{{ item.value.src_path }}"
+    path: "{{ item.value.dst_path }}"
+    opts: "{{ item.value.mode }},{{ item.value.options }}"
+    boot: true
+    state: unmounted
+    fstype: nfs
+  loop: "{{ nfs_hosts.v4 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v4]
+
+
+
+- name: Create NFS 3 mount directory
+  file:
+    path: "{{ item.value.dst_path }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0777"
+  loop: "{{ nfs_hosts.v3 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v3]
+
+- name: Create NFS 4 mount directory
+  file:
+    path: "{{ item.value.dst_path }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0777"
+  loop: "{{ nfs_hosts.v4 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v4]
+
+
+
+- name: Mount NFS 3 volumes
+  mount:
+    src: "{{ item.value.host }}:{{ item.value.src_path }}"
+    path: "{{ item.value.dst_path }}"
+    opts: "{{ item.value.mode }},{{ item.value.options }}"
+    boot: true
+    state: mounted
+    fstype: nfs
+  loop: "{{ nfs_hosts.v3 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage,  storage_nfs, storage_nfs_v3]
+
+- name: Mount NFS 4 volumes
+  mount:
+    src: "{{ item.value.host }}:{{ item.value.src_path }}"
+    path: "{{ item.value.dst_path }}"
+    opts: "{{ item.value.mode }},{{ item.value.options }}"
+    boot: true
+    state: mounted
+    fstype: nfs
+  loop: "{{ nfs_hosts.v4 | dict2items }}"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v4]
+
+
+
+- name: Change permissions for NFS 3 mount directory
+  file:
+    path: "{{ item.value.dst_path }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0777"
+  loop: "{{ nfs_hosts.v3 | dict2items }}"
+  when: nfs_hosts.v3 is defined and nfs_hosts.v3 | length > 0 and item.value.mode == "rw"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v3]
+
+- name: Change permissions for NFS 4 mount directory
+  file:
+    path: "{{ item.value.dst_path }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0777"
+  loop: "{{ nfs_hosts.v4 | dict2items }}"
+  when: nfs_hosts.v4 is defined and nfs_hosts.v4 | length > 0 and item.value.mode == "rw"
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs, storage_nfs_v4]

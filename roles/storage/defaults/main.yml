@@ -1,0 +1,4 @@
+nfs_packages_rpm: [nfs-utils]
+
+nfs_packages_apt:
+  - nfs-common
