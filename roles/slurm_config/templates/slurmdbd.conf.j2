@@ -4,6 +4,11 @@
 AuthType=auth/munge
 AuthInfo=/var/run/munge/munge.socket.2
 
+{% if slurm_web_activated %}
+AuthAltTypes=auth/jwt
+AuthAltParameters=jwt_key=/var/spool/slurm/jwt_hs256.key
+{% endif %}
+
 # slurmDBD info
 DbdAddr=localhost
 DbdHost=localhost

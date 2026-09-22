@@ -1,0 +1,11 @@
+[Service]
+# Unset vendor unit ExecStart and Environment to avoid cumulative definition
+# https://slurm.schedmd.com/slurmrestd.html
+ExecStart=
+Environment="SLURM_JWT=daemon"
+ExecStart=/usr/sbin/slurmrestd $SLURMRESTD_OPTIONS -a rest_auth/jwt unix:/run/slurmrestd/slurmrestd.socket
+RuntimeDirectoryMode=0755
+RuntimeDirectory=slurmrestd
+User=slurmrestd
+Group=slurmrestd
+DynamicUser=yes

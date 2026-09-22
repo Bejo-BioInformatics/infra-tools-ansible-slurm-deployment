@@ -51,10 +51,11 @@
   systemd:
     name: "{{ item }}"
     enabled: yes
-    state: started
+    state: restarted
   loop:
     - slurmctld
     # - slurmdbd
+    # - slurmrestd
   become: yes
   when: inventory_hostname in groups['slurm_controllers']
   ignore_errors: "{{ ansible_check_mode }}"
@@ -64,7 +65,7 @@
   systemd:
     name: "{{ item }}"
     enabled: yes
-    state: started
+    state: restarted
   loop:
     - slurmd
     # - slurmdbd
@@ -152,4 +153,4 @@
   systemd:
     daemon_reload: yes
   ignore_errors: "{{ ansible_check_mode }}"
-  tags: [slurm, slurm_config]
+  tags: [slurm, slurm_install]

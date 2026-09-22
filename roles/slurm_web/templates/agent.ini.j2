@@ -1,0 +1,14 @@
+; https://docs.rackslab.io/slurm-web/conf/conf/agent.html
+
+[service]
+cluster={{ slurm_cluster_title }}
+interface=127.0.0.1
+port=5012
+cors=True
+debug=True
+
+[slurmrestd]
+uri=unix:///run/slurmrestd/slurmrestd.socket
+; auth=local
+jwt_key=/var/lib/slurm-web/slurmrestd.key
+auth=jwt

@@ -1,0 +1,13 @@
+[agents]
+; https://docs.rackslab.io/slurm-web/conf/conf/gateway.html
+url=http://127.0.0.1:5012
+
+[service]
+cors=True
+debug=True
+interface=0.0.0.0
+port=5011
+
+[ui]
+; host=http://0.0.0.0:5011
+host=http://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:5011

@@ -1,0 +1,9 @@
+---
+slurm_web_activated: "{{ slurm_web_enabled | default(true) }}"  # Enable or disable Slurm Web interface
+
+slurm_cluster_title: "{{ slurm_cluster_name | default('Slurm-Cluster') }}"
+
+slurm_packages_controller_apt:
+- slurmrestd #https://docs.rackslab.io/slurm-web/install/quickstart/packages.html
+- slurm-web-agent
+- slurm-web-gateway

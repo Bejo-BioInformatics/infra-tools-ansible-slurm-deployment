@@ -1,0 +1,258 @@
+---
+# https://docs.rackslab.io/slurm-web/install/quickstart/packages.html
+
+- name: Create Slurm configuration
+  block:
+    - name: Create Slurm configuration directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: slurm-web
+        group: slurm-web
+        mode: '0755'
+      loop:
+        - /etc/systemd/system/slurmrestd.service.d/
+        - /etc/slurm-web
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # ignore_errors: "{{ ansible_check_mode }}"
+      # become: yes
+      # tags: [slurm, slurmrest, slurm_web, slurm_rest_install, slurm_web_install]
+
+    - name: Create Slurm socket directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: slurm
+        group: slurm-web
+        mode: '0775'
+      loop:
+        - /run/slurmrestd/
+
+    - name: Template SlurmREST configuration files
+      template:
+        src: "slurm-web.conf.j2"
+        dest: "/etc/systemd/system/slurmrestd.service.d/slurm-web.conf"
+        owner: slurm-web
+        group: slurm-web
+        mode: '0600'
+      # notify: restart slurm services
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # ignore_errors: "{{ ansible_check_mode }}"
+      # become: yes
+      # tags: [slurm, slurmrest, slurm_web, slurm_rest_install, slurm_web_install]
+
+    - name: Template SlurmREST configuration files
+      template:
+        src: "{{ item }}.j2"
+        dest: "/etc/slurm-web/{{ item }}"
+        owner: slurm-web
+        group: slurm-web
+        mode: '0600'
+      loop:
+        - agent.ini
+        - gateway.ini
+      # notify: restart slurm services
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # ignore_errors: "{{ ansible_check_mode }}"
+      # become: yes
+      # tags: [slurm, slurm_web, slurm_web_install]
+
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  ignore_errors: "{{ ansible_check_mode }}"
+  become: yes
+  tags: [slurm, slurm_web, slurm_web_install]
+
+
+
+# https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/apt_repository_module.html
+- name: Add slurmWEB repository
+  block:
+    # - name: slurmWEB | no apt key
+    #   ansible.builtin.get_url:
+    #     url: https://pkgs.rackslab.io/keyring.asc
+    #     dest: /usr/share/keyrings/rackslab.gpg
+
+    # - name: Check if rackslab key exists
+    #   stat:
+    #     path: "/usr/share/keyrings/rackslab.gpg"
+    #   register: rackslab_key_path
+
+    # - name: slurmWEB | add apt key
+    #   ansible.builtin.command: "curl -sS https://pkgs.rackslab.io/keyring.asc | gpg --dearmor | tee /usr/share/keyrings/rackslab.gpg > /dev/null"
+    #   when: not rackslab_key_path.stat.exists
+
+    # - name: slurmWEB | apt source main
+    #   deb822_repository:
+    #     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/rackslab.gpg] https://pkgs.rackslab.io/deb ubuntu24.04 main"
+    #     state: present
+
+    # - name: slurmWEB | apt source slurmweb
+    #   deb822_repository:
+    #     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/rackslab.gpg] https://pkgs.rackslab.io/deb ubuntu24.04 slurmweb-7"
+    #     state: present
+
+    - name: slurmWEB | Add repo using key from URL
+      deb822_repository:
+        name: rackslab
+        types: deb
+        uris: https://pkgs.rackslab.io/deb
+        suites: 'ubuntu24.04'
+        components: main slurmweb-6
+        # suites: 'ubuntu26.04'
+        # components: main slurmweb-7
+        architectures: amd64
+        signed_by: https://pkgs.rackslab.io/keyring.asc
+
+    - name: slurmWEB | apt Install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_web, slurm_web_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurmrest, slurm_web, slurm_rest_install, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Create SlurmREST JWT Key
+  block:
+    - name: SlurmREST JWT Key | Look for Key
+      stat:
+        path: "/var/spool/slurm/jwt_hs256.key"
+      register: slurmrest_jwt_key_path
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_rest, slurm_rest_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmREST JWT Key | Ensure necessary directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: slurm
+        group: slurm
+        mode: '0755'
+      loop:
+        - /var/spool/slurm/
+
+    - name: SlurmREST JWT Key | Create new Key
+      command: "dd if=/dev/urandom of=/var/spool/slurm/jwt_hs256.key bs=32 count=1"
+      when: (not slurmrest_jwt_key_path.stat.exists)
+      # when: (not slurmrest_jwt_key_path.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_rest, slurm_rest_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmREST JWT Key | Change file ownership, group and permissions
+      file:
+        path: /var/spool/slurm/jwt_hs256.key
+        owner: slurm
+        group: slurm
+        mode: '0600'
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurmrest, slurm_web, slurm_rest_install, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Create SlurmWEB Session Key
+  block:
+    - name: SlurmWEB Session Key | Look for Key
+      stat:
+        path: "/var/lib/slurm-web/session.key"
+      register: slurm_web_session_key
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_web, slurm_web_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmWEB Session Key | Create new Key
+      command: "slurm-web gen-session-key --set-ownership"
+      when: (not slurm_web_session_key.stat.exists)
+      # when: (not slurm_web_session_key.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_web, slurm_web_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmWEB Session Key | Change file ownership, group and permissions
+      file:
+        path: /var/lib/slurm-web/session.key
+        owner: slurm-web
+        group: slurm-web
+        mode: '0600'
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_web, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Create SlurmWEB JWT Key
+  block:
+    - name: Create SlurmWEB JWT Key | Look for Key
+      stat:
+        path: "/var/lib/slurm-web/jwt.key"
+      register: slurm_web_jwt_key
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_web, slurm_web_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: Create new SlurmWEB JWT Key | Generate if not exists
+      command: "slurm-web gen-jwt-key --set-ownership"
+      when: (not slurm_web_jwt_key.stat.exists)
+      # when: (not slurm_web_jwt_key.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_web, slurm_web_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmWEB JWT Key | Change file ownership, group and permissions
+      file:
+        path: /var/lib/slurm-web/jwt.key
+        owner: slurm-web
+        group: slurm-web
+        mode: '0600'
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_web, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Copy Slurm JWT signing key
+  ansible.builtin.copy:
+    remote_src: true
+    src: /var/spool/slurm/jwt_hs256.key
+    dest: /var/lib/slurm-web/slurmrestd.key
+    owner: slurm-web
+    group: slurm-web
+    mode: '0400'
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_web, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Enable and start Slurm Controller services in Controllers
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: restarted
+    daemon_reexec: yes
+    daemon_reload: yes
+  loop:
+    - slurmrestd
+    - slurm-web-agent
+    - slurm-web-gateway
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_web, slurm_rest, slurm_web_install, slurm_rest_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"

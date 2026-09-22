@@ -22,8 +22,8 @@
     src: "{{ item }}.j2"
     dest: "/etc/slurm/{{ item }}"
     owner: slurm
-    group: slurm
-    mode: '0600'
+    group: "{{ slurm_web_activated | ternary('slurm', 'slurm-web') }}"
+    mode: '0644'
   loop:
     - slurm.conf
     - slurmdbd.conf
@@ -47,4 +47,3 @@
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_config]
-

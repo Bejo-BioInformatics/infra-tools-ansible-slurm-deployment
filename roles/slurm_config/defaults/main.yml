@@ -1,3 +1,4 @@
 ---
 slurm_primary_controller_name: "{{ slurm_primary_controller | default('control1') }}"  # Your main controller hostname
 slurm_cluster_title: "{{ slurm_cluster_name | default('Slurm-Cluster') }}"
+slurm_web_activated: "{{ slurm_web_enabled | default(true) }}"  # Enable or disable Slurm Web interface
