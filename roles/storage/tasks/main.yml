@@ -3,6 +3,8 @@
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   become: true
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(nfs_packages_apt, nfs_packages_rpm) }}"
   tags: [storage, storage_install]

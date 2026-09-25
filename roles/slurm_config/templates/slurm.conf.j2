@@ -44,7 +44,7 @@ MpiDefault=none
 # LOGGING AND ACCOUNTING
 AccountingStorageHost={{ hostvars[slurm_primary_controller_name].ansible_facts.hostname }}
 AccountingStorageType=accounting_storage/slurmdbd
-AccountingStorageUser=slurm
+#AccountingStorageUser=slurm
 AccountingStoragePort=6819
 JobAcctGatherFrequency=30
 JobAcctGatherType=jobacct_gather/none
@@ -52,6 +52,12 @@ SlurmctldDebug=info
 SlurmctldLogFile=/var/log/slurm/slurmctld.log
 SlurmdDebug=info
 SlurmdLogFile=/var/log/slurm/slurmd.log
+
+
+{% if slurm_web_activated %}
+AuthAltTypes=auth/jwt
+AuthAltParameters=jwt_key=/var/spool/slurmd/jwt_hs256.key
+{% endif %}
 
 
 # DYNAMIC NODE LIST - All nodes get same list

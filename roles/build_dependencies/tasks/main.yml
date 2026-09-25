@@ -1,8 +1,16 @@
 ---
+- name: Update cache and upgrade all packages
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    upgrade: yes
+
 - name: Install base dependencies and build tools
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
   tags: base_deps
 
@@ -10,6 +18,8 @@
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(dev_libraries_apt, dev_libraries_rpm) }}"
   tags: dev_libs
 

@@ -47,3 +47,46 @@
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_config]
+
+
+
+- name: Create SlurmREST JWT Key
+  block:
+    - name: SlurmREST JWT Key | Look for Key
+      stat:
+        path: "/var/spool/slurmd/jwt_hs256.key"
+      register: slurmrest_jwt_key_path
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_rest, slurm_rest_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmREST JWT Key | Ensure necessary directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: slurm
+        group: slurm
+        mode: '0755'
+      loop:
+        - /var/spool/slurmd/
+
+    - name: SlurmREST JWT Key | Create new Key
+      command: "dd if=/dev/urandom of=/var/spool/slurmd/jwt_hs256.key bs=32 count=1"
+      when: (not slurmrest_jwt_key_path.stat.exists)
+      # when: (not slurmrest_jwt_key_path.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+      # tags: [slurm, slurm_rest, slurm_rest_install]
+      # become: yes
+      # ignore_errors: "{{ ansible_check_mode }}"
+
+    - name: SlurmREST JWT Key | Change file ownership, group and permissions
+      file:
+        path: /var/spool/slurmd/jwt_hs256.key
+        owner: slurm
+        group: slurm
+        mode: '0600'
+      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_config, slurm_config_files]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"

@@ -20,6 +20,8 @@
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(libjwt_build_deps_apt, libjwt_build_deps_rpm) }}"
   tags: libjwt
 

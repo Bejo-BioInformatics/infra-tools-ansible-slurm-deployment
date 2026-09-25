@@ -5,6 +5,8 @@
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   become: yes
   when: inventory_hostname in groups['slurm_controllers']
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
@@ -14,6 +16,8 @@
   package:
     name: "{{ item }}"
     state: absent
+    update_cache: true
+    cache_valid_time: 3600
   become: yes
   when: inventory_hostname in groups['slurm_controllers']
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt, slurm_packages_worker_rpm) }}"
@@ -25,6 +29,8 @@
   package:
     name: "{{ item }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
   become: yes
   when: inventory_hostname in groups['slurm_computes']
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt + slurm_packages_shared_apt, slurm_packages_worker_rpm + slurm_packages_shared_rpm) }}"
@@ -34,6 +40,8 @@
   package:
     name: "{{ item }}"
     state: absent
+    update_cache: true
+    cache_valid_time: 3600
   become: yes
   when: inventory_hostname in groups['slurm_computes']
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt, slurm_packages_controller_rpm) }}"

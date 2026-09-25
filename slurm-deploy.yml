@@ -5,10 +5,10 @@
   gather_facts: yes
 
   roles:
+    - role: build_dependencies
     - role: slurm_base
     - role: slurm_user
     - role: munge
-    - role: build_dependencies
     - role: mariadb
     - role: slurm_config
     - role: slurm_install
