@@ -1,8 +1,14 @@
 ---
-- name: Deploy Slurm
+- name: Gather facts
   hosts: all
   become: yes
   gather_facts: yes
+
+- name: Deploy Slurm
+  hosts: all
+  become: yes
+  # gather_facts: yes
+  serial: 1
 
   roles:
     - role: build_dependencies

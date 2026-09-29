@@ -76,3 +76,11 @@ dev_libraries_apt:
   - libssl-dev
   - libsystemd-dev
   - python3-dev
+
+remove_packages_rpm:
+  - mdatp
+  - WALinuxAgent
+
+remove_packages_apt:
+  - mdatp
+  - walinuxagent

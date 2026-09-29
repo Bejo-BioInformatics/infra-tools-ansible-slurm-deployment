@@ -10,4 +10,4 @@ port=5011
 
 [ui]
 ; host=http://0.0.0.0:5011
-host=http://{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}:5011
+host=http://{{ hostvars[inventory_hostname]['ansible_facts']['eth0']['ipv4']['address'] }}:5011
