@@ -81,15 +81,14 @@ NodeName={{ hostvars[host].ansible_facts.hostname }} NodeHostname={{ hostvars[ho
 
 
 # DYNAMIC PARTITION
-PartitionName=debug Nodes={% for host in (('slurm_computes_cpu' in groups) | ternary(groups['slurm_computes_cpu'], [])) + (('slurm_computes_gpu' in groups) | ternary(groups['slurm_computes_gpu'], [])) %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
 {##}
-{% if ('slurm_computes_cpu' in groups) and ((groups['slurm_computes_cpu']|length) > 0) %}
-PartitionName=cpu   Nodes={% for host in groups['slurm_computes_cpu'] %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
+{% for partition in slurm_partitions %}
+{% if ((groups[partition.group]|length) > 0) %}
+PartitionName={{ partition.name }} Nodes={% for host in groups[partition.group] %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default={{ partition.default }} MaxTime={{ partition.max_time }} State=UP
 {% endif %}
-{#-#}
-{% if ('slurm_computes_gpu' in groups) and ((groups['slurm_computes_gpu']|length) > 0) %}
-PartitionName=gpu   Nodes={% for host in groups['slurm_computes_gpu'] %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
-{% endif %}
+{% endfor %}
+{##}
+PartitionName=debug Nodes={% for host in (('slurm_computes_cpu' in groups) | ternary(groups['slurm_computes_cpu'], [])) + (('slurm_computes_gpu' in groups) | ternary(groups['slurm_computes_gpu'], [])) %}{{ hostvars[host].ansible_facts.hostname }}{% if not loop.last %},{% endif %}{% endfor %} Default=YES MaxTime=INFINITE State=UP
 
 
 
