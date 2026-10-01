@@ -22,8 +22,8 @@
     src: "{{ item }}.j2"
     dest: "/etc/slurm/{{ item }}"
     owner: slurm
-    group: "{{ slurm_web_activated | ternary('slurm', 'slurm-web') }}"
-    mode: '0644'
+    group: "{{ slurm_web_activated | ternary('slurm-web', 'slurm') }}"
+    mode: '0640'
   loop:
     - slurm.conf
     - slurmdbd.conf

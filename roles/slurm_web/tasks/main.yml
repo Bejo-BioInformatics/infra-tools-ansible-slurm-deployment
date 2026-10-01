@@ -23,7 +23,7 @@
         system: yes
         shell: /usr/sbin/nologin
         # groups: slurm,slurm-web
-        groups: slurmrestd
+        groups: slurmrestd,slurm-web
         append: no
 
     - name: Ensure users exists | Create a slurm-web system user
@@ -111,11 +111,6 @@
       loop:
         - agent.ini
         - gateway.ini
-      # notify: restart slurm services
-      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # ignore_errors: "{{ ansible_check_mode }}"
-      # become: yes
-      # tags: [slurm, slurm_web, slurm_web_install]
 
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   ignore_errors: "{{ ansible_check_mode }}"
@@ -127,30 +122,6 @@
 # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/apt_repository_module.html
 - name: Add slurmWEB repository
   block:
-    # - name: slurmWEB | no apt key
-    #   ansible.builtin.get_url:
-    #     url: https://pkgs.rackslab.io/keyring.asc
-    #     dest: /usr/share/keyrings/rackslab.gpg
-
-    # - name: Check if rackslab key exists
-    #   stat:
-    #     path: "/usr/share/keyrings/rackslab.gpg"
-    #   register: rackslab_key_path
-
-    # - name: slurmWEB | add apt key
-    #   ansible.builtin.command: "curl -sS https://pkgs.rackslab.io/keyring.asc | gpg --dearmor | tee /usr/share/keyrings/rackslab.gpg > /dev/null"
-    #   when: not rackslab_key_path.stat.exists
-
-    # - name: slurmWEB | apt source main
-    #   deb822_repository:
-    #     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/rackslab.gpg] https://pkgs.rackslab.io/deb ubuntu24.04 main"
-    #     state: present
-
-    # - name: slurmWEB | apt source slurmweb
-    #   deb822_repository:
-    #     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/rackslab.gpg] https://pkgs.rackslab.io/deb ubuntu24.04 slurmweb-7"
-    #     state: present
-
     - name: slurmWEB | Add repo using key from URL
       deb822_repository:
         name: rackslab
@@ -169,10 +140,6 @@
         state: present
         update_cache: true  
       loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
-      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # tags: [slurm, slurm_web, slurm_web_install]
-      # become: yes
-      # ignore_errors: "{{ ansible_check_mode }}"
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurmrest, slurm_web, slurm_rest_install, slurm_web_install]
   become: yes
@@ -186,18 +153,10 @@
       stat:
         path: "/var/lib/slurm-web/session.key"
       register: slurm_web_session_key
-      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # tags: [slurm, slurm_web, slurm_web_install]
-      # become: yes
-      # ignore_errors: "{{ ansible_check_mode }}"
 
     - name: SlurmWEB Session Key | Create new Key
       command: "slurm-web gen-session-key --set-ownership"
       when: (not slurm_web_session_key.stat.exists)
-      # when: (not slurm_web_session_key.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # tags: [slurm, slurm_web, slurm_web_install]
-      # become: yes
-      # ignore_errors: "{{ ansible_check_mode }}"
 
     - name: SlurmWEB Session Key | Change file ownership, group and permissions
       file:
