@@ -22,7 +22,7 @@
     src: "{{ item }}.j2"
     dest: "/etc/slurm/{{ item }}"
     owner: slurm
-    group: "{{ slurm_web_activated | ternary('slurm-web', 'slurm') }}"
+    group: "{{ (slurm_web_activated and (inventory_hostname in groups['slurm_controllers'])) | ternary('slurm-web', 'slurm') }}"
     mode: '0640'
   loop:
     - slurm.conf

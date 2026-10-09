@@ -29,21 +29,6 @@
     - { path: '/var/log/munge', mode: '0755' }
   tags: [munge, munge_directories]
 
-# - name: Look for munge.key
-#   stat:
-#     path: "munge.key"
-#   register: munge_key_path
-#   delegate_to: localhost
-#   run_once: true
-#   tags: [munge, munge_key]
-
-# - name: Create new munge.key
-#   command: "dd if=/dev/urandom of=munge.key bs=1 count=1024"
-#   delegate_to: localhost
-#   run_once: true
-#   when: not munge_key_path.stat.exists
-#   tags: [munge, munge_key]
-
 - name: Copy munge.key from project root to all nodes
   copy:
     src: munge.key  # Path from role to project root

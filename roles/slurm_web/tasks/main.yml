@@ -234,3 +234,15 @@
   tags: [slurm, slurm_web, slurm_rest, slurm_web_install, slurm_rest_install]
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: Add ssh default user to slurm-web group
+  user:
+    name: "{{ ansible_ssh_user | default('slurm') }}"
+    groups: slurm-web
+    append: yes
+  tags: [slurm, slurm_web, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
