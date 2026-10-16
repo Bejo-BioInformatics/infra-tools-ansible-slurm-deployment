@@ -12,6 +12,7 @@
 
   roles:
     - role: build_dependencies
+    - role: docker
     - role: slurm_base
     - role: slurm_user
     - role: munge
