@@ -97,12 +97,14 @@
           {{ test_job_output.stdout }}
         dest: "/data/slurm-{{ slurm_cluster_name }}-cluster_info.txt"
       delegate_to: localhost
+
     - name: Fetch slurm.conf
       fetch:
         src: /etc/slurm/slurm.conf
         dest: "/data/slurm-{{ slurm_cluster_name }}-slurm.conf"
         flat: yes
         validate_checksum: true
+
     - name: Change file ownership, group and permissions
       delegate_to: localhost
       ansible.builtin.file:
@@ -110,6 +112,7 @@
         owner: 1002
         group: 502
         mode: '0644'
+
     - name: Change file ownership, group and permissions for slurm.conf
       delegate_to: localhost
       ansible.builtin.file:
