@@ -1,0 +1,118 @@
+---
+# https://oneuptime.com/blog/post/2026-03-04-ansible-configure-nfs-shares-rhel-9/view
+
+- name: Update cache and upgrade all packages
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    upgrade: yes
+  become: yes
+  tags: [nfs_deps, nfs_deps_update]
+
+- name: Install NFS server packages
+  package:
+    name:
+      - nfs-common
+      - nfs-kernel-server
+      - rpcbind
+    state: present
+    cache_valid_time: 3600
+  when: (inventory_hostname in groups['slurm_controllers'])
+  become: yes
+  tags: [nfs_deps, nfs_deps_install, nfs_deps_server_install]
+
+- name: Install NFS client packages
+  package:
+    name:
+      - nfs-common
+    state: present
+    cache_valid_time: 3600
+  when: (inventory_hostname not in groups['slurm_controllers'])
+  become: yes
+  tags: [nfs_deps, nfs_deps_install, nfs_deps_client_install]
+
+- name: Configure /etc/exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload NFS exports
+  when: (inventory_hostname in groups['slurm_controllers'])
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [nfs_deps, nfs_deps_install, nfs_deps_server_install]
+
+- name: Enable and start NFS services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - rpcbind
+    - nfs-server
+  when: (inventory_hostname in groups['slurm_controllers'])
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [nfs_deps, nfs_deps_install, nfs_deps_server_install]
+
+- name: Open firewall for NFS
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd
+  when: (inventory_hostname in groups['slurm_controllers'])
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [nfs_deps, nfs_deps_install, nfs_deps_server_install]
+
+# - name: Create mount point directories
+#   ansible.builtin.file:
+#     path: "{{ item.path }}"
+#     state: directory
+#     mode: "0755"
+#   loop: "{{ nfs_mounts }}"
+
+# - name: Mount NFS shares
+#   ansible.posix.mount:
+#     src: "{{ item.src }}"
+#     path: "{{ item.path }}"
+#     fstype: nfs
+#     opts: "{{ item.opts }}"
+#     state: mounted
+#   loop: "{{ nfs_mounts }}"
+
+
+- name: Mount NFS volumes
+  mount:
+    src:  "{{ item.value.host }}:{{ item.value.src_path }}"
+    path: "{{ item.value.dst_path }}"
+    opts: "{{ item.value.mode }},{{ item.value.options }}"
+    boot: true
+    state: mounted
+    fstype: nfs
+  loop: "{{ nfs_hosts | dict2items }}"
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage,  storage_nfs]
+
+
+
+- name: Change permissions for NFS mount directory
+  file:
+    path: "{{ item.value.dst_path }}"
+    state: directory
+    owner: slurm
+    group: slurm
+    mode: "0777"
+  loop: "{{ nfs_hosts | dict2items }}"
+  when: nfs_hosts is defined and nfs_hosts | length > 0 and item.value.mode == "rw"
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags: [storage, storage_nfs]

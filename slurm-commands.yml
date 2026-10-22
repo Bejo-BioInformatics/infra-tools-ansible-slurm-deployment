@@ -57,6 +57,12 @@
     - debug:
         var: completed_job_stats.stdout
 
+    - name: Show Slurm Configuration
+      command: scontrol show config
+      register: slurm_config
+    - debug:
+        var: slurm_config.stdout
+
     - name: Run a test job on 2 nodes
       command: srun -N 2 hostname
       register: test_job_output
@@ -74,7 +80,9 @@
           ## Node Info
           {{ node_info.stdout }}
           
-          
+          ## Slurm Configuration
+          {{ slurm_config.stdout }}
+
           ## Cluster Nodes
           {{ cluster_nodes.stdout }}
           

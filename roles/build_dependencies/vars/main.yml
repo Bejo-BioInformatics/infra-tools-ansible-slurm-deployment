@@ -19,6 +19,8 @@ base_packages_rpm:
   - pam-devel
   - perl-ExtUtils-MakeMaker
   - pkgconf
+  - pipx
+  - python3-pip
   - python3-devel
   - readline
   - readline-devel
