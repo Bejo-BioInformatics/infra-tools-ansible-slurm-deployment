@@ -1,0 +1,22 @@
+---
+# https://oneuptime.com/blog/post/2026-03-02-how-to-configure-slurm-workload-manager-on-ubuntu/view
+- name: Run Azure VM Commands
+  hosts: localhost
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: start
+      command: az vm start   --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      loop: "{{ groups['all'] }}"
+      tags: start
+
+    - name: stop
+      command: az vm stop    --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      loop: "{{ groups['all'] }}"
+      tags: stop
+
+    - name: restart
+      command: az vm restart --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      loop: "{{ groups['all'] }}"
+      tags: restart
