@@ -43,6 +43,24 @@
 
 
 
+- name: Template Slurm configuration files
+  file:
+    path: "/etc/slurm/{{ item }}"
+    state: touch
+    owner: slurm
+    group: slurm-web
+  loop:
+    - slurm.conf
+    - slurmdbd.conf
+    - topology.conf
+    - cgroup.conf
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  ignore_errors: "{{ ansible_check_mode }}"
+  become: yes
+  tags: [slurm, slurm_web, slurm_web_install]
+
+
+
 - name: Ensure Slurm configuration exists
   block:
     - name: Ensure Slurm configuration exists | SlurmRESTd configuration directories
