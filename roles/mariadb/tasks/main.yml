@@ -1,5 +1,5 @@
 ---
-- name: Install MariaDB server and client
+- name: MariaDB | Install MariaDB server and client
   become: true
   package:
     name: "{{ item }}"
@@ -10,7 +10,7 @@
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_install]
 
-- name: Start and enable MariaDB service
+- name: MariaDB | Start and enable MariaDB service
   become: true
   systemd:
     name: mariadb
@@ -20,7 +20,7 @@
   tags: [mariadb, mariadb_service]
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Wait for MariaDB to be ready
+- name: MariaDB | Wait for MariaDB to be ready
   become: true
   wait_for:
     path: "{{ (ansible_facts['os_family'] == 'Debian') | ternary('/run/mysqld/mysqld.sock', '/var/lib/mysql/mysql.sock') }}"
@@ -29,35 +29,35 @@
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_setup]
 
-- name: Create Slurm database
+- name: MariaDB | Create Slurm database
   become: true
   command:
     cmd: "mysql -e 'CREATE DATABASE IF NOT EXISTS slurm_acct_db;'"
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_setup]
 
-- name: Create Slurm database user without password
+- name: MariaDB | Create Slurm database user without password
   become: true
   command:
     cmd: "mysql -e \"CREATE USER IF NOT EXISTS 'slurm'@'localhost';\""
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_setup]
 
-- name: Grant privileges to Slurm user
+- name: MariaDB | Grant privileges to Slurm user
   become: true
   command:
     cmd: "mysql -e 'GRANT ALL PRIVILEGES ON slurm_acct_db.* TO \"slurm\"@\"localhost\";'"
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_setup]
 
-- name: Flush privileges
+- name: MariaDB | Flush privileges
   become: true
   command:
     cmd: "mysql -e 'FLUSH PRIVILEGES;'"
   when: inventory_hostname in groups['slurm_controllers']
   tags: [mariadb, mariadb_setup]
 
-- name: Display database setup completion
+- name: MariaDB | Display database setup completion
   become: true
   debug:
     msg: "MariaDB setup completed - Slurm database and user created without password"

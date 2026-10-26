@@ -1,5 +1,5 @@
 ---
-- name: Install Munge packages
+- name: Munge | Install Munge packages
   package:
     name: "{{ item }}"
     state: present
@@ -8,28 +8,7 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(munge_packages_apt, munge_packages_rpm) }}"
   tags: [munge, munge_install]
 
-# - name: Create munge user
-#   user:
-#     name: munge
-#     system: yes
-#     shell: /bin/false
-#     state: present
-#   tags: [munge, munge_user]
-
-# - name: Create Munge directories
-#   file:
-#     path: "{{ item.path }}"
-#     state: directory
-#     owner: munge
-#     group: munge
-#     mode: "{{ item.mode }}"
-#   loop:
-#     - { path: '/etc/munge',     mode: '0700' }
-#     - { path: '/var/lib/munge', mode: '0700' }
-#     - { path: '/var/log/munge', mode: '0755' }
-#   tags: [munge, munge_directories]
-
-- name: Copy munge.key from project root to all nodes
+- name: Munge | Copy munge.key from project root to all nodes
   copy:
     src: munge.key  # Path from role to project root
     dest: /etc/munge/munge.key

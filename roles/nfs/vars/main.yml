@@ -1,9 +1,13 @@
 ---
 slurm_primary_controller_name: "{{ slurm_primary_controller | default('control1') }}"
 
-nfs_server: "{{ slurm_primary_controller_name }}"
+nfs_server: "{{ hostvars[slurm_primary_controller_name].ansible_facts.hostname }}"
+
+# if ('ansible_facts' in hostvars[slurm_primary_controller]) and ('hostname' in hostvars[slurm_primary_controller].ansible_facts)
 
 nfs_mounts:
-  - src: "{{ nfs_server }}:/home/{{ ansible_user}}"
-    path: "/home/{{ ansible_user}}"
-    opts: "rw,sync,hard"
+  - src_server: "{{ nfs_server }}"
+    src_path: "/home/{{ ansible_user}}"
+    dst_path: "/home/{{ ansible_user}}"
+    mode: "rw"
+    options: "sync,hard"

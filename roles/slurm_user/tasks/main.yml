@@ -1,12 +1,12 @@
 ---
-- name: Create slurm group
+- name: SLURM User | Create slurm group
   group:
     name: slurm
     gid: "{{ slurm_user_id}}"
     state: present
   tags: [slurm, slurm_user]
 
-- name: Create slurm user
+- name: SLURM User | Create slurm user
   user:
     name: slurm
     comment: "SLURM Daemon User"
@@ -18,7 +18,7 @@
     create_home: yes
   tags: [slurm, slurm_user]
 
-- name: Create Slurm log directory
+- name: SLURM User | Create Slurm log directory
   file:
     path: /var/log/slurm
     state: directory
@@ -28,7 +28,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_user]
 
-- name: Create Slurm spool directories
+- name: SLURM User | Create Slurm spool directories
   file:
     path: "{{ item }}"
     state: directory
@@ -41,7 +41,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_user]
 
-- name: Create Slurm runtime directory
+- name: SLURM User | Create Slurm runtime directory
   file:
     path: /run/slurm
     state: directory
@@ -51,7 +51,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_user]
 
-- name: Add ssh default user to slurm group
+- name: SLURM User | Add ssh default user to slurm group
   user:
     name: "{{ ansible_ssh_user | default('slurm') }}"
     groups: slurm

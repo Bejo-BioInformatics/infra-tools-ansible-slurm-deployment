@@ -3,19 +3,19 @@
 
 # sudo useradd -M -r -s /usr/sbin/nologin -U slurmrestd
 
-- name: Ensure users exists
+- name: SLURM Web | Ensure users exists
   block:
-    - name: Ensure users exists | slurmrestd group
+    - name: SLURM Web | Ensure users exists | slurmrestd group
       ansible.builtin.group:
         name: slurmrestd
         state: present
 
-    - name: Ensure users exists | slurm-web group
+    - name: SLURM Web | Ensure users exists | slurm-web group
       ansible.builtin.group:
         name: slurm-web
         state: present
 
-    - name: Ensure users exists | Create a slurmrestd system user
+    - name: SLURM Web | Ensure users exists | Create a slurmrestd system user
       ansible.builtin.user:
         name: slurmrestd
         group: slurmrestd
@@ -26,7 +26,7 @@
         groups: slurmrestd,slurm-web
         append: no
 
-    - name: Ensure users exists | Create a slurm-web system user
+    - name: SLURM Web | Ensure users exists | Create a slurm-web system user
       ansible.builtin.user:
         name: slurm-web
         group: slurm-web
@@ -43,7 +43,7 @@
 
 
 
-- name: Template Slurm configuration files
+- name: SLURM Web | Template Slurm configuration files
   file:
     path: "/etc/slurm/{{ item }}"
     state: touch
@@ -61,9 +61,9 @@
 
 
 
-- name: Ensure Slurm configuration exists
+- name: SLURM Web | Ensure Slurm configuration exists
   block:
-    - name: Ensure Slurm configuration exists | SlurmRESTd configuration directories
+    - name: SLURM Web | Ensure Slurm configuration exists | SlurmRESTd configuration directories
       file:
         path: "{{ item }}"
         state: directory
@@ -73,7 +73,7 @@
       loop:
         - /etc/systemd/system/slurmrestd.service.d/
 
-    - name: Ensure Slurm configuration exists | SlurmRESTd socket directories
+    - name: SLURM Web | Ensure Slurm configuration exists | SlurmRESTd socket directories
       file:
         path: "{{ item }}"
         state: directory
@@ -83,7 +83,7 @@
       loop:
         - /run/slurmrestd/
 
-    - name: Ensure Slurm configuration exists | SlurmWEB configuration directories
+    - name: SLURM Web | Ensure Slurm configuration exists | SlurmWEB configuration directories
       file:
         path: "{{ item }}"
         state: directory
@@ -95,7 +95,7 @@
         - /etc/systemd/system/slurm-web-gateway.service.d/
         - /etc/slurm-web
 
-    - name: Ensure Slurm configuration exists | Template SlurmRESTd configuration files
+    - name: SLURM Web | Ensure Slurm configuration exists | Template SlurmRESTd configuration files
       template:
         src: "slurmrestd.conf.j2"
         dest: "/etc/systemd/system/slurmrestd.service.d/slurmrestd.conf"
@@ -103,7 +103,7 @@
         group: slurmrestd
         mode: '0644'
 
-    - name: Ensure Slurm configuration exists | Template SlurmWEB Agent configuration files
+    - name: SLURM Web | Ensure Slurm configuration exists | Template SlurmWEB Agent configuration files
       template:
         src: "slurm-web-agent.conf.j2"
         dest: "/etc/systemd/system/slurm-web-agent.service.d/slurm-web-agent.conf"
@@ -111,7 +111,7 @@
         group: slurm-web
         mode: '0644'
 
-    - name: Ensure Slurm configuration exists | Template SlurmWEB Gateway configuration files
+    - name: SLURM Web | Ensure Slurm configuration exists | Template SlurmWEB Gateway configuration files
       template:
         src: "slurm-web-gateway.conf.j2"
         dest: "/etc/systemd/system/slurm-web-gateway.service.d/slurm-web-gateway.conf"
@@ -119,7 +119,7 @@
         group: slurm-web
         mode: '0644'
 
-    - name: Ensure Slurm configuration exists | Template SlurmWEB configuration files
+    - name: SLURM Web | Ensure Slurm configuration exists | Template SlurmWEB configuration files
       template:
         src: "{{ item }}.j2"
         dest: "/etc/slurm-web/{{ item }}"
@@ -138,9 +138,9 @@
 
 
 # https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/apt_repository_module.html
-- name: Add slurmWEB repository
+- name: SLURM Web | Add slurmWEB repository
   block:
-    - name: slurmWEB | Add repo using key from URL
+    - name: SLURM Web | Add slurmWEB repository | Add repo using key from URL
       deb822_repository:
         name: rackslab
         types: deb
@@ -152,7 +152,7 @@
         architectures: amd64
         signed_by: https://pkgs.rackslab.io/keyring.asc
 
-    - name: slurmWEB | apt Install packages
+    - name: SLURM Web | Add slurmWEB repository | apt Install packages
       package:
         name: "{{ item }}"
         state: present
@@ -165,18 +165,18 @@
 
 
 
-- name: Create SlurmWEB Session Key
+- name: SLURM Web | Create SlurmWEB Session Key
   block:
-    - name: SlurmWEB Session Key | Look for Key
+    - name: SLURM Web | Create SlurmWEB Session Key | Look for Key
       stat:
         path: "/var/lib/slurm-web/session.key"
       register: slurm_web_session_key
 
-    - name: SlurmWEB Session Key | Create new Key
+    - name: SLURM Web | Create SlurmWEB Session Key | Create new Key
       command: "slurm-web gen-session-key --set-ownership"
       when: (not slurm_web_session_key.stat.exists)
 
-    - name: SlurmWEB Session Key | Change file ownership, group and permissions
+    - name: SLURM Web | Create SlurmWEB Session Key | Change file ownership, group and permissions
       file:
         path: /var/lib/slurm-web/session.key
         owner: slurm-web
@@ -189,18 +189,18 @@
 
 
 
-- name: Create SlurmWEB JWT Key
+- name: SLURM Web | Create SlurmWEB JWT Key
   block:
-    - name: Create SlurmWEB JWT Key | Look for Key
+    - name: SLURM Web | Create SlurmWEB JWT Key | Look for Key
       stat:
         path: "/var/lib/slurm-web/jwt.key"
       register: slurm_web_jwt_key
 
-    - name: Create new SlurmWEB JWT Key | Generate if not exists
+    - name: SLURM Web | Create SlurmWEB JWT Key | Generate if not exists
       command: "slurm-web gen-jwt-key --set-ownership"
       when: (not slurm_web_jwt_key.stat.exists)
 
-    - name: SlurmWEB JWT Key | Change file ownership, group and permissions
+    - name: SLURM Web | Create SlurmWEB JWT Key | Change file ownership, group and permissions
       file:
         path: /var/lib/slurm-web/jwt.key
         owner: slurm-web
@@ -213,7 +213,7 @@
 
 
 
-- name: Copy Slurm JWT signing key
+- name: SLURM Web | Copy Slurm JWT signing key
   ansible.builtin.copy:
     remote_src: true
     src: /var/spool/slurmd/jwt_hs256.key
@@ -228,7 +228,7 @@
 
 
 
-- name: Check SlurmWEB
+- name: SLURM Web | Check SlurmWEB
   command: "slurm-web connect-check"
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurm_web, slurm_web_install]
@@ -237,7 +237,7 @@
 
 
 
-- name: Enable and start Slurm Controller services in Controllers
+- name: SLURM Web | Enable and start Slurm Controller services in Controllers
   systemd:
     name: "{{ item }}"
     enabled: yes
@@ -255,7 +255,7 @@
 
 
 
-- name: Add ssh default user to slurm-web group
+- name: SLURM Web | Add ssh default user to slurm-web group
   user:
     name: "{{ ansible_ssh_user | default('slurm') }}"
     groups: slurm-web

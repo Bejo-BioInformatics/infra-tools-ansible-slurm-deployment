@@ -1,13 +1,13 @@
 ---
 # Reference: https://dev.to/lovestaco/install-docker-with-ansible-on-ubuntu-official-repo-docker-compose-578b
-- name: Update apt cache
+- name: Docker | Update apt cache
   ansible.builtin.apt:
     update_cache: yes
   ignore_errors: "{{ ansible_check_mode }}"
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Ensure dependencies are installed
+- name: Docker | Ensure dependencies are installed
   ansible.builtin.package:
     name:
       - bc
@@ -19,7 +19,7 @@
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Create Docker GPG key directory
+- name: Docker | Create Docker GPG key directory
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
@@ -27,7 +27,7 @@
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Download Docker's official GPG key
+- name: Docker | Download Docker's official GPG key
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /etc/apt/keyrings/docker.asc
@@ -35,7 +35,7 @@
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Add Docker repository to Apt sources
+- name: Docker | Add Docker repository to Apt sources
   ansible.builtin.apt_repository:
     repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
     state: present
@@ -43,13 +43,13 @@
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Update apt cache after adding Docker repository
+- name: Docker | Update apt cache after adding Docker repository
   ansible.builtin.apt:
     update_cache: yes
   when: (inventory_hostname in groups['slurm_controllers'])
   tags: [docker]
 
-- name: Install Docker and Docker Compose
+- name: Docker | Install Docker and Docker Compose
   ansible.builtin.package:
     name:
       - docker-ce
@@ -62,7 +62,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [docker]
 
-- name: Ensure Docker service is enabled and started
+- name: Docker | Ensure Docker service is enabled and started
   ansible.builtin.service:
     name: docker
     state: started
@@ -71,7 +71,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [docker]
 
-- name: Add main user to docker group
+- name: Docker | Add main user to docker group
   ansible.builtin.user:
     name: "{{ ansible_ssh_user | default('ubuntu') }}"
     groups: docker

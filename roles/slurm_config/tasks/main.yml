@@ -1,5 +1,5 @@
 ---
-- name: Create Slurm configuration directories
+- name: Slurm Config | Create Slurm configuration directories
   file:
     path: "{{ item }}"
     state: directory
@@ -17,7 +17,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_config]
 
-- name: Template Slurm configuration files
+- name: Slurm Config | Template Slurm configuration files
   template:
     src: "{{ item }}.j2"
     dest: "/etc/slurm/{{ item }}"
@@ -34,7 +34,7 @@
   become: yes
   tags: [slurm, slurm_config, slurm_config_files]
 
-- name: Set proper ownership on Slurm directories
+- name: Slurm Config | Set proper ownership on Slurm directories
   file:
     path: "{{ item }}"
     owner: slurm
@@ -50,9 +50,9 @@
 
 
 
-- name: Create SlurmREST JWT Key
+- name: Slurm Config | Create SlurmREST JWT Key
   block:
-    - name: SlurmREST JWT Key | Look for Key
+    - name: Slurm Config | Create SlurmREST JWT Key | Look for Key
       stat:
         path: "/var/spool/slurmd/jwt_hs256.key"
       register: slurmrest_jwt_key_path
@@ -61,7 +61,7 @@
       # become: yes
       # ignore_errors: "{{ ansible_check_mode }}"
 
-    - name: SlurmREST JWT Key | Ensure necessary directories exist
+    - name: Slurm Config | Create SlurmREST JWT Key | Ensure necessary directories exist
       file:
         path: "{{ item }}"
         state: directory
@@ -71,7 +71,7 @@
       loop:
         - /var/spool/slurmd/
 
-    - name: SlurmREST JWT Key | Create new Key
+    - name: Slurm Config | Create SlurmREST JWT Key | Create new Key
       command: "dd if=/dev/urandom of=/var/spool/slurmd/jwt_hs256.key bs=32 count=1"
       when: (not slurmrest_jwt_key_path.stat.exists)
       # when: (not slurmrest_jwt_key_path.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
@@ -79,7 +79,7 @@
       # become: yes
       # ignore_errors: "{{ ansible_check_mode }}"
 
-    - name: SlurmREST JWT Key | Change file ownership, group and permissions
+    - name: Slurm Config | Create SlurmREST JWT Key | Change file ownership, group and permissions
       file:
         path: /var/spool/slurmd/jwt_hs256.key
         owner: slurm

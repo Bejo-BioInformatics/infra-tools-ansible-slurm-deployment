@@ -1,7 +1,7 @@
 ---
 # https://www.linkedin.com/pulse/slurm-setup-easy-way-ubuntu-2404-practical-guide-building-nagaraj-s-tj7cc
 
-- name: Install Slurm Controller packages in Controller
+- name: SLURM Install | Install Slurm Controller packages in Controller
   package:
     name: "{{ item }}"
     state: present
@@ -12,7 +12,7 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
   tags: [slurm, slurm_install]
 
-- name: UnInstall Slurm Deamon packages in Controller
+- name: SLURM Install | UnInstall Slurm Deamon packages in Controller
   package:
     name: "{{ item }}"
     state: absent
@@ -25,7 +25,7 @@
 
 
 
-- name: Install Slurm Worker packages in Worker
+- name: SLURM Install | Install Slurm Worker packages in Worker
   package:
     name: "{{ item }}"
     state: present
@@ -36,7 +36,7 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt + slurm_packages_shared_apt, slurm_packages_worker_rpm + slurm_packages_shared_rpm) }}"
   tags: [slurm, slurm_install]
 
-- name: UnInstall Slurm Controller packages in Worker
+- name: SLURM Install | UnInstall Slurm Controller packages in Worker
   package:
     name: "{{ item }}"
     state: absent
@@ -49,13 +49,13 @@
 
 
 
-- name: reload systemd
+- name: SLURM Install | reload systemd
   systemd:
     daemon_reload: yes
 
 
 
-- name: Enable and start Slurm Controller services in Controllers
+- name: SLURM Install | Enable and start Slurm Controller services in Controllers
   systemd:
     name: "{{ item }}"
     enabled: yes
@@ -69,7 +69,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_install]
 
-- name: Enable and start Slurm Worker services in Workers
+- name: SLURM Install | Enable and start Slurm Worker services in Workers
   systemd:
     name: "{{ item }}"
     enabled: yes
@@ -84,7 +84,7 @@
 
 
 
-- name: Restart Slurm Controller services in Controllers
+- name: SLURM Install | Restart Slurm Controller services in Controllers
   systemd_service:
     state: restarted
     enabled: true
@@ -98,7 +98,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_install]
 
-- name: Restart Slurm Worker services in Workers
+- name: SLURM Install | Restart Slurm Worker services in Workers
   systemd_service:
     state: restarted
     enabled: true
@@ -114,7 +114,7 @@
 
 
 
-- name: reload systemd
+- name: SLURM Install | reload systemd
   systemd:
     daemon_reload: yes
   ignore_errors: "{{ ansible_check_mode }}"

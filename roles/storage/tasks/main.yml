@@ -1,5 +1,5 @@
 ---
-- name: Install NFS packages
+- name: Storage | Install NFS packages
   package:
     name: "{{ item }}"
     state: present
@@ -11,7 +11,7 @@
 
 
 
-- name: UnMount NFS volumes
+- name: Storage | UnMount NFS volumes
   mount:
     src:  "{{ item.value.host }}:{{ item.value.src_path }}"
     path: "{{ item.value.dst_path }}"
@@ -26,15 +26,15 @@
 
 
 
-- name: Create NFS mount directories
+- name: Storage | Create NFS mount directories
   block:
-    - name: Create NFS mount directories | Ensure NFS mount directory exists
+    - name: Storage | Create NFS mount directories | Ensure NFS mount directory exists
       stat:
         path: "{{ item.value.dst_path }}"
       register: stat_results
       with_items: "{{ nfs_hosts | dict2items }}"
 
-    - name: Create NFS mount directories | Create NFS mount directory
+    - name: Storage | Create NFS mount directories | Create NFS mount directory
       file:
         path: "{{ item.item.value.dst_path }}"
         state: directory
@@ -51,7 +51,7 @@
 
 
 
-- name: Mount NFS volumes
+- name: Storage | Mount NFS volumes
   mount:
     src:  "{{ item.value.host }}:{{ item.value.src_path }}"
     path: "{{ item.value.dst_path }}"
@@ -66,7 +66,7 @@
 
 
 
-- name: Change permissions for NFS mount directory
+- name: Storage | Change permissions for NFS mount directory
   file:
     path: "{{ item.value.dst_path }}"
     state: directory

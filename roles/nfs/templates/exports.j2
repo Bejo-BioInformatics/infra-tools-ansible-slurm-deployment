@@ -1,0 +1,19 @@
+#/mnt/my_shares client-IP-1(rw,sync,no_subtree_check)
+
+{% for mnt in nfs_mounts %}
+{% for host in groups['slurm_computes_cpu'] %}
+{% if ('ansible_facts' in hostvars[host]) and ('hostname' in hostvars[host].ansible_facts) %}
+
+{{ mnt.src_path }} {{ hostvars[host].ansible_facts.hostname }}(rw,sync,no_subtree_check)
+
+{% endif %}
+{% endfor %}
+
+{% for mnt in groups['slurm_computes_gpu'] %}
+{% if ('ansible_facts' in hostvars[host]) and ('hostname' in hostvars[host].ansible_facts) %}
+
+{{ mnt.src_path }} {{ hostvars[host].ansible_facts.hostname }}(rw,sync,no_subtree_check)
+
+{% endif %}
+{% endfor %}
+{% endfor %}

@@ -1,5 +1,5 @@
 ---
-- name: Create slurm-files directory
+- name: SLURM Base | Create slurm-files directory
   file:
     path: "/home/{{ ansible_user }}/slurm-files"
     state: directory
