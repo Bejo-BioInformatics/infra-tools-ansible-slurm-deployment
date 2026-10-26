@@ -7,16 +7,16 @@
 
   tasks:
     - name: start
-      command: az vm start   --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      command: bash -c 'az login --identity && az vm start   --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }} --verbose'
       loop: "{{ groups['all'] }}"
-      tags: start
+      tags: [start]
 
     - name: stop
-      command: az vm stop    --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      command: bash -c 'az login --identity && az vm stop    --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }} --verbose'
       loop: "{{ groups['all'] }}"
-      tags: stop
-
+      tags: [stop]
+  
     - name: restart
-      command: az vm restart --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }}
+      command: bash -c 'az login --identity && az vm restart --resource-group {{ hostvars[item].ansible_host_resource_group }} --name {{ hostvars[item].ansible_host_name }} --verbose'
       loop: "{{ groups['all'] }}"
-      tags: restart
+      tags: [restart]
