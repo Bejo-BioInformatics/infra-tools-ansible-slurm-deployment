@@ -97,7 +97,7 @@
     group: slurm
     mode: "0777"
   loop: "{{ nfs_mounts }}"
-  when: nfs_mounts is defined and nfs_mounts | length > 0 and item.mode == "rw"
+  when: nfs_mounts is defined and nfs_mounts | length > 0 and item.mode == "rw" and (inventory_hostname not in groups['slurm_controllers'])
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [nfs, nfs_mount, nfs_perms]
@@ -113,6 +113,7 @@
     state: mounted
     fstype: nfs
   loop: "{{ nfs_mounts }}"
+  when: (inventory_hostname not in groups['slurm_controllers'])
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [nfs, nfs_mount]
