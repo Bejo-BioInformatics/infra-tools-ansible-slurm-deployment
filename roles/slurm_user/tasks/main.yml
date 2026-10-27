@@ -1,62 +1,62 @@
 ---
-- name: SLURM User | Create slurm group
-  group:
-    name: slurm
-    gid: "{{ slurm_user_id}}"
-    state: present
-  tags: [slurm, slurm_user]
+# - name: SLURM User | Create slurm group
+#   group:
+#     name: slurm
+#     gid: "{{ slurm_user_id}}"
+#     state: present
+#   tags: [slurm, slurm_user]
 
-- name: SLURM User | Create slurm user
-  user:
-    name: slurm
-    comment: "SLURM Daemon User"
-    home: /var/lib/slurm
-    uid: "{{ slurm_user_id }}"
-    group: slurm
-    shell: /bin/bash
-    system: yes
-    create_home: yes
-  tags: [slurm, slurm_user]
+# - name: SLURM User | Create slurm user
+#   user:
+#     name: slurm
+#     comment: "SLURM Daemon User"
+#     home: /var/lib/slurm
+#     uid: "{{ slurm_user_id }}"
+#     group: slurm
+#     shell: /bin/bash
+#     system: yes
+#     create_home: yes
+#   tags: [slurm, slurm_user]
 
-- name: SLURM User | Create Slurm log directory
-  file:
-    path: /var/log/slurm
-    state: directory
-    owner: slurm
-    group: slurm
-    mode: "0755"
-  ignore_errors: "{{ ansible_check_mode }}"
-  tags: [slurm, slurm_user]
+# - name: SLURM User | Create Slurm log directory
+#   file:
+#     path: /var/log/slurm
+#     state: directory
+#     owner: slurm
+#     group: slurm
+#     mode: "0755"
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_user]
 
-- name: SLURM User | Create Slurm spool directories
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: slurm
-    group: slurm
-    mode: "0755"
-  loop:
-    - /var/spool/slurmd
-    - /var/spool/slurmctld
-  ignore_errors: "{{ ansible_check_mode }}"
-  tags: [slurm, slurm_user]
+# - name: SLURM User | Create Slurm spool directories
+#   file:
+#     path: "{{ item }}"
+#     state: directory
+#     owner: slurm
+#     group: slurm
+#     mode: "0755"
+#   loop:
+#     - /var/spool/slurmd
+#     - /var/spool/slurmctld
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_user]
 
-- name: SLURM User | Create Slurm runtime directory
-  file:
-    path: /run/slurm
-    state: directory
-    owner: slurm
-    group: slurm
-    mode: "0755"
-  ignore_errors: "{{ ansible_check_mode }}"
-  tags: [slurm, slurm_user]
+# - name: SLURM User | Create Slurm runtime directory
+#   file:
+#     path: /run/slurm
+#     state: directory
+#     owner: slurm
+#     group: slurm
+#     mode: "0755"
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags: [slurm, slurm_user]
 
-- name: SLURM User | Add ssh default user to slurm group
-  user:
-    name: "{{ ansible_ssh_user | default('slurm') }}"
-    groups: slurm
-    append: yes
-  tags: [slurm, slurm_user]
-  become: yes
-  ignore_errors: "{{ ansible_check_mode }}"
-  when: (inventory_hostname in groups['slurm_controllers'])
+# - name: SLURM User | Add ssh default user to slurm group
+#   user:
+#     name: "{{ ansible_ssh_user | default('slurm') }}"
+#     groups: slurm
+#     append: yes
+#   tags: [slurm, slurm_user]
+#   become: yes
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   when: (inventory_hostname in groups['slurm_controllers'])

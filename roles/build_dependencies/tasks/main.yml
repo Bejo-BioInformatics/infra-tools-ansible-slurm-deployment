@@ -1,12 +1,12 @@
 ---
-- name: Build | Update cache and upgrade all packages
+- name: Build Dependecies | Update cache and upgrade all packages
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
     upgrade: yes
   tags: [system_deps, system_deps_update]
 
-- name: Build | Install base dependencies and build tools
+- name: Build Dependecies | Install base dependencies and build tools
   package:
     name: "{{ item }}"
     state: present
@@ -15,7 +15,7 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
   tags: [system_deps, system_deps_base]
 
-- name: Build | Remove unnecessary packages
+- name: Build Dependecies | Remove unnecessary packages
   package:
     name: "{{ item }}"
     state: absent
@@ -24,7 +24,7 @@
   loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(remove_packages_apt, remove_packages_rpm) }}"
   tags: [system_deps, system_deps_remove]
 
-- name: Build | Install Development libraries
+- name: Build Dependecies | Install Development libraries
   package:
     name: "{{ item }}"
     state: present

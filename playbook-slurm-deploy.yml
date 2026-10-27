@@ -2,7 +2,12 @@
 - name: Gather facts
   hosts: all
   become: yes
-  gather_facts: yes
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: Gather facts
+      gather_facts:
+        parallel: false
 
 - name: Deploy Slurm
   hosts: all
@@ -21,4 +26,4 @@
     - role: slurm_install
     - role: slurm_web
     - role: storage
-    - role: nfs
+    # - role: nfs

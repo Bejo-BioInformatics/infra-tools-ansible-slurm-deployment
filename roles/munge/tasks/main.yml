@@ -19,7 +19,7 @@
   notify: restart munge
   tags: [munge, munge_key]
 
-- name: Enable and start munge service
+- name: Munge | Enable and start munge service
   systemd:
     name: munge
     enabled: yes

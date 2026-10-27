@@ -39,11 +39,11 @@ base_packages_apt:
   - git
   - libssl-dev
   - libpam0g-dev
-  - libextutils-makemaker-cpanfile-perl
+  # - libextutils-makemaker-cpanfile-perl
   - libjansson4
   - libjansson-dev
   - liblua5.4-dev
-  - libpmix2
+  # - libpmix2
   - libreadline8t64
   - libreadline6-dev
   - libtool

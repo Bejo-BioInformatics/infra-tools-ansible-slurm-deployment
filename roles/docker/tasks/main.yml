@@ -37,7 +37,7 @@
 
 - name: Docker | Add Docker repository to Apt sources
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} resolute"
     state: present
     filename: docker
   when: (inventory_hostname in groups['slurm_controllers'])

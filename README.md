@@ -1,7 +1,20 @@
 # Slurm HPC Cluster Automation with Ansible
 
 ## Overview
-This project represents my journey into learning Ansible by tackling a real-world challenge: automating the complex deployment of a Slurm HPC cluster. I took my existing manual installation script and transformed it into a dynamic, enterprise-grade Ansible automation. Now, you can deploy a production-ready Slurm cluster where the version is dynamically fetched from the official website. For a deeper dive into the manual process that inspired this automation, check out my Medium article: A Comprehensive Guide to Installing Slurm from Source https://medium.com/@vishal.papan/a-comprehensive-guide-to-installing-slurm-from-source-20028ff837d7.
+This project represents my journey into learning Ansible by tackling a
+real-world challenge: automating the complex deployment of a Slurm HPC cluster.
+
+I took my existing manual installation script and transformed it into a
+dynamic, enterprise-grade Ansible automation.
+
+Now, you can deploy a production-ready Slurm cluster where the version is
+dynamically fetched from the official website.
+
+For a deeper dive into the manual process that inspired this automation, check
+out my Medium article: A Comprehensive Guide to Installing Slurm from Source
+https://medium.com/@vishal.papan/a-comprehensive-guide-to-installing-slurm-from-source-20028ff837d7.
+
+https://lucaberton.com/blog/slurm-ansible-automated-cluster-deployment/
 
 ## Architecture Diagram
 
