@@ -1,0 +1,53 @@
+---
+# https://www.linkedin.com/pulse/slurm-setup-easy-way-ubuntu-2404-practical-guide-building-nagaraj-s-tj7cc
+
+- name: SLURM Install | Install Slurm Controller packages in Controller
+  package:
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
+    # name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt + slurm_packages_shared_apt, slurm_packages_controller_rpm + slurm_packages_shared_rpm) }}"
+  tags: [slurm, slurm_install]
+
+- name: SLURM Install | UnInstall Slurm Deamon packages in Controller
+  package:
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt, slurm_packages_worker_rpm) }}"
+    state: absent
+    update_cache: true
+    cache_valid_time: 3600
+  become: yes
+  when: inventory_hostname in groups['slurm_controllers']
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt, slurm_packages_worker_rpm) }}"
+  tags: [slurm, slurm_install]
+
+
+
+- name: SLURM Install | Install Slurm Worker packages in Worker
+  package:
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt + slurm_packages_shared_apt, slurm_packages_worker_rpm + slurm_packages_shared_rpm) }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_worker_apt + slurm_packages_shared_apt, slurm_packages_worker_rpm + slurm_packages_shared_rpm) }}"
+  tags: [slurm, slurm_install]
+
+- name: SLURM Install | UnInstall Slurm Controller packages in Worker
+  package:
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt, slurm_packages_controller_rpm) }}"
+    state: absent
+    update_cache: true
+    cache_valid_time: 3600
+  become: yes
+  when: inventory_hostname in groups['slurm_computes']
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(slurm_packages_controller_apt, slurm_packages_controller_rpm) }}"
+  tags: [slurm, slurm_install]
+

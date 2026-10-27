@@ -1,34 +1,43 @@
 ---
-- name: Build Dependecies | Update cache and upgrade all packages
+- name: Build Dependencies | Clean apt cache
+  ansible.builtin.apt:
+    clean: yes
+  when: (inventory_hostname in groups['slurm_controllers'])
+  tags: [system_deps]
+
+- name: Build Dependencies | Update cache and upgrade all packages
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
     upgrade: yes
   tags: [system_deps, system_deps_update]
 
-- name: Build Dependecies | Install base dependencies and build tools
+- name: Build Dependencies | Install base dependencies and build tools
   package:
-    name: "{{ item }}"
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
     state: present
     update_cache: true
     cache_valid_time: 3600
-  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(base_packages_apt, base_packages_rpm) }}"
   tags: [system_deps, system_deps_base]
 
-- name: Build Dependecies | Remove unnecessary packages
+- name: Build Dependencies | Remove unnecessary packages
   package:
-    name: "{{ item }}"
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(remove_packages_apt, remove_packages_rpm) }}"
     state: absent
     update_cache: true
     cache_valid_time: 3600
-  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(remove_packages_apt, remove_packages_rpm) }}"
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(remove_packages_apt, remove_packages_rpm) }}"
   tags: [system_deps, system_deps_remove]
 
-- name: Build Dependecies | Install Development libraries
+- name: Build Dependencies | Install Development libraries
   package:
-    name: "{{ item }}"
+    # name: "{{ item }}"
+    name: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(dev_libraries_apt, dev_libraries_rpm) }}"
     state: present
     update_cache: true
     cache_valid_time: 3600
-  loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(dev_libraries_apt, dev_libraries_rpm) }}"
+  # loop: "{{ (ansible_facts['os_family'] == 'Debian') | ternary(dev_libraries_apt, dev_libraries_rpm) }}"
   tags: [system_deps, system_deps_dev_libs]

@@ -2,12 +2,7 @@
 - name: Gather facts
   hosts: all
   become: yes
-  gather_facts: false
-  serial: 1
-  tasks:
-    - name: Gather facts
-      gather_facts:
-        parallel: false
+  gather_facts: yes
 
 - name: Deploy Slurm
   hosts: all
@@ -18,11 +13,11 @@
   roles:
     - role: build_dependencies
     - role: docker
-    - role: slurm_base
-    - role: slurm_user
     - role: munge
     - role: mariadb
-    - role: slurm_config
+    # - role: slurm_base
+    - role: slurm_user
+    # - role: slurm_config
     - role: slurm_install
     - role: slurm_web
     - role: storage

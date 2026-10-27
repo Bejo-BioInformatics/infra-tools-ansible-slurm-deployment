@@ -29,7 +29,6 @@
     - slurmdbd.conf
     - topology.conf
     - cgroup.conf
-  # notify: restart slurm services
   ignore_errors: "{{ ansible_check_mode }}"
   become: yes
   tags: [slurm, slurm_config, slurm_config_files]
@@ -56,10 +55,6 @@
       stat:
         path: "/var/spool/slurmd/jwt_hs256.key"
       register: slurmrest_jwt_key_path
-      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # tags: [slurm, slurm_rest, slurm_rest_install]
-      # become: yes
-      # ignore_errors: "{{ ansible_check_mode }}"
 
     - name: Slurm Config | Create SlurmREST JWT Key | Ensure necessary directories exist
       file:
@@ -74,10 +69,6 @@
     - name: Slurm Config | Create SlurmREST JWT Key | Create new Key
       command: "dd if=/dev/urandom of=/var/spool/slurmd/jwt_hs256.key bs=32 count=1"
       when: (not slurmrest_jwt_key_path.stat.exists)
-      # when: (not slurmrest_jwt_key_path.stat.exists) and (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-      # tags: [slurm, slurm_rest, slurm_rest_install]
-      # become: yes
-      # ignore_errors: "{{ ansible_check_mode }}"
 
     - name: Slurm Config | Create SlurmREST JWT Key | Change file ownership, group and permissions
       file:
@@ -85,7 +76,6 @@
         owner: slurm
         group: slurm
         mode: '0600'
-      # when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurm_config, slurm_config_files]
   become: yes
