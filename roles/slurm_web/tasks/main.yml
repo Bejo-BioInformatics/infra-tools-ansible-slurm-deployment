@@ -125,7 +125,7 @@
         dest: "/etc/slurm-web/{{ item }}"
         owner: slurm-web
         group: slurm-web
-        mode: '0600'
+        mode: '0640'
       loop:
         - agent.ini
         - gateway.ini
@@ -181,7 +181,7 @@
         path: /var/lib/slurm-web/session.key
         owner: slurm-web
         group: slurm-web
-        mode: '0600'
+        mode: '0440'
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurm_web, slurm_web_install]
   become: yes
@@ -205,7 +205,7 @@
         path: /var/lib/slurm-web/jwt.key
         owner: slurm-web
         group: slurm-web
-        mode: '0600'
+        mode: '0440'
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurm_web, slurm_web_install]
   become: yes
@@ -220,16 +220,7 @@
     dest: /var/lib/slurm-web/slurmrestd.key
     owner: slurm-web
     group: slurm-web
-    mode: '0400'
-  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
-  tags: [slurm, slurm_web, slurm_web_install]
-  become: yes
-  ignore_errors: "{{ ansible_check_mode }}"
-
-
-
-- name: SLURM Web | Check SlurmWEB
-  command: "slurm-web connect-check"
+    mode: '0440'
   when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
   tags: [slurm, slurm_web, slurm_web_install]
   become: yes
@@ -252,6 +243,16 @@
   tags: [slurm, slurm_web, slurm_rest, slurm_web_install, slurm_rest_install]
   become: yes
   ignore_errors: "{{ ansible_check_mode }}"
+
+
+
+- name: SLURM Web | Check SlurmWEB
+  command: "slurm-web connect-check"
+  when: (inventory_hostname in groups['slurm_controllers']) and slurm_web_activated
+  tags: [slurm, slurm_web, slurm_web_install]
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+
 
 
 
