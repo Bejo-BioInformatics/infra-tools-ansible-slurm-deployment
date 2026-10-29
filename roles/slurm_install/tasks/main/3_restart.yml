@@ -1,11 +1,11 @@
 ---
-- name: SLURM Install | reload systemd
+- name: SLURM Install | 3. Restart | reload systemd
   systemd:
     daemon_reload: yes
   tags: [slurm, slurm_install, slurm_restart]
 
 
-- name: SLURM Install | Enable and start Slurm Controller services in Controllers
+- name: SLURM Install | 3. Restart | Enable and start Slurm Controller services in Controllers
   systemd:
     name: "{{ item }}"
     enabled: yes
@@ -19,7 +19,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_install, slurm_restart]
 
-- name: SLURM Install | Enable and start Slurm Worker services in Workers
+- name: SLURM Install | 3. Restart | Enable and start Slurm Worker services in Workers
   systemd:
     name: "{{ item }}"
     enabled: yes
@@ -34,7 +34,7 @@
 
 
 
-- name: SLURM Install | Restart Slurm Controller services in Controllers
+- name: SLURM Install | 3. Restart | Restart Slurm Controller services in Controllers
   systemd_service:
     state: restarted
     enabled: true
@@ -48,7 +48,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   tags: [slurm, slurm_install, slurm_restart]
 
-- name: SLURM Install | Restart Slurm Worker services in Workers
+- name: SLURM Install | 3. Restart | Restart Slurm Worker services in Workers
   systemd_service:
     state: restarted
     enabled: true
@@ -64,7 +64,7 @@
 
 
 
-- name: SLURM Install | reload systemd
+- name: SLURM Install | 3. Restart | reload systemd
   systemd:
     daemon_reload: yes
   ignore_errors: "{{ ansible_check_mode }}"

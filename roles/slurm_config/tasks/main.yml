@@ -20,15 +20,15 @@
 - name: Slurm Config | Template Slurm configuration files
   template:
     src: "{{ item }}.j2"
-    dest: "/etc/slurm/{{ item }}"
+    dest: "{{ item }}"
     owner: slurm
     group: slurm
     mode: '0640'
   loop:
-    - slurm.conf
-    - slurmdbd.conf
-    - topology.conf
-    - cgroup.conf
+    - /etc/slurm/slurm.conf
+    - /etc/slurm/slurmdbd.conf
+    - /etc/slurm/topology.conf
+    - /etc/slurm/cgroup.conf
   ignore_errors: "{{ ansible_check_mode }}"
   become: yes
   tags: [slurm, slurm_config, slurm_config_files]

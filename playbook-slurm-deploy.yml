@@ -17,7 +17,7 @@
     - role: mariadb
     - role: munge
     # - role: slurm_base
-    - role: slurm_config
+    # - role: slurm_config
     - role: slurm_user
     - role: slurm_install
     - role: slurm_web

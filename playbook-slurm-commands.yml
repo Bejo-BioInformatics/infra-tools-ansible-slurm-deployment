@@ -69,6 +69,18 @@
     - debug:
         var: test_job_output.stdout
 
+    - name: Show Job Details
+      command: scontrol show job
+      register: job_details
+    - debug:
+        var: job_details.stdout
+
+    - name: Show Node Reasons
+      command: sinfo -R
+      register: node_reasons
+    - debug:
+        var: node_reasons.stdout
+
     - name: copy the output to a local file
       copy:
         content: |
@@ -100,9 +112,16 @@
           
           ## Completed Job Stats
           {{ completed_job_stats.stdout }}
-          
+
+          ## Job Details
+          {{ job_details.stdout }}
+
           ## Test Job Output
           {{ test_job_output.stdout }}
+
+          ## Node Reasons
+          {{ node_reasons.stdout }}
+
         dest: "/data/slurm-{{ slurm_cluster_name }}-cluster_info.txt"
       delegate_to: localhost
 
@@ -133,8 +152,8 @@
 # # Add to slurm.conf or manage via sacctmgr
 
 # sacctmgr add qos high-priority priority=100 MaxTRESPerUser=cpu=32
-# sacctmgr add qos standard priority=50 MaxTRESPerUser=cpu=64 MaxWall=7-00:00:00
-# sacctmgr add qos low priority=10 MaxTRESPerUser=cpu=128
+# sacctmgr add qos standard      priority=50  MaxTRESPerUser=cpu=64 MaxWall=7-00:00:00
+# sacctmgr add qos low           priority=10  MaxTRESPerUser=cpu=128
 
 # # Assign a QOS to a user
 # sacctmgr modify user alice set qos=standard
