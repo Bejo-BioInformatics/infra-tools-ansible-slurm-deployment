@@ -10,6 +10,8 @@ AuthType=auth/munge
 ReturnToService=2
 ProctrackType=proctrack/cgroup
 TaskPlugin=task/cgroup,task/affinity
+# https://niflheim-system.readthedocs.io/en/latest/Slurm_database.html#setting-database-purge-parameters
+PurgeJobAfter=30days
 
 
 # PID and Port configurations
